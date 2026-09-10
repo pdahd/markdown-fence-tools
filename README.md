@@ -52,10 +52,6 @@ https://pdahd.github.io/markdown-fence-tools/panel.js
 
 `userscript/MD_Fence_Tools.user.js` 可直接粘贴进 Tampermonkey。它在普通网页内提供右下角“工具”启动按钮，以及 `Ctrl + Alt + M` 快捷键。
 
-## 更新远程版本
-
-修改 `panel.js` 后，先运行 `python3 scripts/build-standalone.py` 同步生成自包含的 `index.html`，再将两者提交到 `main` 分支。远程书签会附加当前时间戳参数，避免浏览器长期复用旧缓存，因此无需每次手工修改书签版本号。
-
 ## 说明
 
 “转纯文本”面向常见笔记、README、教程类 Markdown。它会处理标题、强调、链接、图片、围栏代码、引用、无序列表、任务列表、分隔线和常见 HTML 标签；复杂 CommonMark/GFM 边界语法并非完整解析器范围。
