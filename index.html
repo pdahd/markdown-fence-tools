@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
-  <title>Markdown 围栏工作台</title>
+  <meta name="md-fence-tools-standalone-version" content="2.0.1">
+  <title>Markdown 围栏工作台 · v2.0.1</title>
   <style>
     :root {
       color-scheme: dark;
@@ -1132,6 +1133,20 @@
     #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
     #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
 
+    /* 缩进 / 反缩进有独立的按住反馈；脚本在 pointerdown 即加类、在抬起或取消时立刻移除。 */
+    #zmf .indent > .ib.is-pressed {
+      background: #1d4ed8 !important;
+      color: #fff !important;
+      box-shadow: inset 0 2px 8px rgba(3, 20, 66, .45), 0 0 0 2px rgba(96, 165, 250, .30) !important;
+      filter: saturate(1.18) brightness(.93);
+    }
+    #zmf .outdent > .ib.is-pressed {
+      background: #b91c1c !important;
+      color: #fff !important;
+      box-shadow: inset 0 2px 8px rgba(69, 10, 10, .48), 0 0 0 2px rgba(252, 113, 113, .26) !important;
+      filter: saturate(1.16) brightness(.94);
+    }
+
     /* 下拉菜单紧贴顶部功能区中的各自按钮，而不再从页面底部弹出。 */
     #zmf .menu {
       top: calc(100% + 8px);
@@ -1225,23 +1240,94 @@
     }
   </style>
   <script>
-    // 独立页特有的小增强：更换品牌标题，并禁用悬浮面板的拖动/折叠快捷键。
+    // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
     (function () {
+      var STANDALONE_VERSION = '2.0.1';
       var panel = document.getElementById('zmf');
       if (!panel) return;
+
       var header = panel.querySelector('.h');
       var title = header && header.querySelector('span');
-      if (title) title.textContent = 'Markdown 围栏工作台';
+      if (title) title.textContent = 'Markdown 围栏工作台 · v' + STANDALONE_VERSION;
       if (header) {
         var badge = document.createElement('span');
         badge.className = 'site-kicker';
-        badge.textContent = '独立编辑空间';
+        badge.textContent = '独立版 v' + STANDALONE_VERSION;
         header.appendChild(badge);
+        // 全页工作台不应被误拖动或双击折叠。
         header.addEventListener('pointerdown', function (event) {
           if (!event.target.closest('.x')) event.stopImmediatePropagation();
         }, true);
         header.addEventListener('dblclick', function (event) { event.stopImmediatePropagation(); }, true);
       }
+
+      var editor = panel.querySelector('textarea');
+      function suppressEditorKeyboard() {
+        // 共享面板的工具按钮也采用该策略；这里让嵌在清理按钮中的箭头同样立即收起软键盘。
+        if (!editor) return;
+        editor.setAttribute('inputmode', 'none');
+        editor.readOnly = true;
+        if (navigator.virtualKeyboard && typeof navigator.virtualKeyboard.hide === 'function') {
+          try { navigator.virtualKeyboard.hide(); } catch (ignore) {}
+        }
+      }
+
+      // “清理围栏”的箭头嵌在主按钮内。捕获阶段先锁定编辑器输入模式，避免触摸该箭头时重新请求软键盘。
+      var cleanArrow = panel.querySelector('.clean-arrow');
+      if (cleanArrow) {
+        ['pointerdown', 'mousedown', 'click'].forEach(function (eventName) {
+          cleanArrow.addEventListener(eventName, suppressEditorKeyboard, true);
+        });
+      }
+
+      // 导入面板在 pointerdown 立即打开。部分移动浏览器会把同一次手势随后产生的 click 重新命中遮罩，
+      // 导致它刚显示就被“点遮罩关闭”；仅忽略这一个短暂的后续遮罩 click，真正的后续点击仍照常关闭。
+      var importButton = panel.querySelector('[data-k="im"]');
+      var importSheet = panel.querySelector('[data-import-sheet]');
+      var ignoreBackdropClickUntil = 0;
+      if (importButton && importSheet) {
+        importButton.addEventListener('pointerdown', function (event) {
+          if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+          ignoreBackdropClickUntil = Date.now() + 850;
+          // 与共享运行时的 openImportSheet() 做相同状态更新，确保本页遮罩立即、稳定地呈现。
+          importSheet.classList.add('show');
+          importSheet.setAttribute('aria-hidden', 'false');
+        }, true);
+        importSheet.addEventListener('click', function (event) {
+          if (event.target === importSheet && Date.now() < ignoreBackdropClickUntil) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        }, true);
+      }
+
+      // 缩进/反缩进共用已有的立即执行及长按逻辑；这里只补上严格随按下/松开同步的视觉状态。
+      function installPressedFeedback(button) {
+        if (!button) return;
+        var activePointerId = null;
+        function removePressed(event) {
+          if (event && activePointerId !== null && event.pointerId !== undefined && event.pointerId !== activePointerId) return;
+          activePointerId = null;
+          button.classList.remove('is-pressed');
+        }
+        button.addEventListener('pointerdown', function (event) {
+          if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+          activePointerId = event.pointerId;
+          button.classList.add('is-pressed');
+        });
+        button.addEventListener('pointerup', removePressed);
+        button.addEventListener('pointercancel', removePressed);
+        button.addEventListener('lostpointercapture', removePressed);
+        window.addEventListener('blur', removePressed);
+        button.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' || event.key === ' ') button.classList.add('is-pressed');
+        });
+        button.addEventListener('keyup', removePressed);
+      }
+      installPressedFeedback(panel.querySelector('.indent > .ib'));
+      installPressedFeedback(panel.querySelector('.outdent > .ib'));
+
+      // 独立页没有浮动启动器，故禁用原面板的 Ctrl+Alt+M 开关，避免整个工作台被意外关闭。
       document.addEventListener('keydown', function (event) {
         if (event.ctrlKey && event.altKey && String(event.key).toLowerCase() === 'm') {
           event.preventDefault();
@@ -1250,5 +1336,5 @@
       }, true);
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38b97893819b0ae',t:'MTc4OTAxMzUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38bebf4ed2a3340',t:'MTc4OTAxNjk3OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
