@@ -10,24 +10,24 @@
   <style>
     :root {
       color-scheme: light;
-      background: #dbe2ec;
+      background: #f1f5f9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     html, body { width: 100%; min-height: 100%; margin: 0; overflow: hidden; }
     body {
       background:
-        radial-gradient(900px 600px at -10% -16%, rgba(13, 148, 136, .14), transparent 66%),
-        radial-gradient(800px 540px at 110% 0%, rgba(37, 99, 235, .13), transparent 66%),
-        linear-gradient(145deg, #e8edf5 0%, #d5dded 52%, #dfe5f0 100%);
-      color: #1e293b;
+        radial-gradient(900px 600px at -10% -16%, rgba(20, 184, 166, .08), transparent 66%),
+        radial-gradient(800px 540px at 110% 0%, rgba(59, 130, 246, .1), transparent 66%),
+        linear-gradient(145deg, #f8fafc 0%, #e2e8f0 52%, #cbd5e1 100%);
+      color: #334155;
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .5;
-      background-image: linear-gradient(rgba(15,23,42,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(15,23,42,.035) 1px, transparent 1px);
+      opacity: .4;
+      background-image: linear-gradient(rgba(0,0,0,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.035) 1px, transparent 1px);
       background-size: 28px 28px;
       mask-image: linear-gradient(to bottom, #000, transparent 88%);
     }
@@ -38,10 +38,10 @@
       max-width: 720px;
       margin: 52px auto;
       padding: 18px 22px;
-      border: 1px solid rgba(220, 38, 38, .42);
+      border: 1px solid rgba(220, 38, 38, .3);
       border-radius: 14px;
       color: #b91c1c;
-      background: rgba(254, 226, 226, .88);
+      background: rgba(254, 226, 226, .8);
     }
   </style>
 </head>
@@ -74,13 +74,13 @@
   S.textContent = `
 #zmf-launch{position:fixed;right:18px;bottom:18px;z-index:2147483646;width:46px;height:46px;border:0;border-radius:50%;background:#0f766e;color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.38);font:800 13px/1 system-ui,sans-serif;letter-spacing:.2px;cursor:pointer}
 #zmf-launch:hover{background:#115e59;transform:translateY(-1px)}
-#zmf{position:fixed;left:5vw;top:6vh;width:90vw;height:80vh;z-index:2147483647;display:flex;flex-direction:column;background:#1f2330;color:#e6e9f0;border:1px solid #3a4055;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.55);font-family:system-ui,sans-serif;overflow:hidden}
-#zmf .h{flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 14px;background:linear-gradient(135deg,#0f766e,#155e75);color:#fff;font-weight:700;font-size:15px;cursor:move;user-select:none;-webkit-user-select:none;touch-action:none}
-#zmf .x{flex:0 0 32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border-radius:50%;background:rgba(255,255,255,.18)}
-#zmf textarea{flex:1 1 auto;min-height:0;border:0;outline:0;resize:none;padding:12px 14px;background:#171a24;color:#e6e9f0;font:14px/1.6 ui-monospace,Consolas,monospace;box-sizing:border-box}
-#zmf .c{flex:0 0 auto;padding:6px 14px;background:#202635;border-top:1px solid #3a4055;color:#94a3b8;font:12px/1.4 ui-monospace,Consolas,monospace;text-align:right}
+#zmf{position:fixed;left:5vw;top:6vh;width:90vw;height:80vh;z-index:2147483647;display:flex;flex-direction:column;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.1);font-family:system-ui,sans-serif;overflow:hidden}
+#zmf .h{flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 14px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);color:#1e293b;font-weight:700;font-size:15px;cursor:move;user-select:none;-webkit-user-select:none;touch-action:none}
+#zmf .x{flex:0 0 32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border-radius:50%;background:rgba(0,0,0,.08);color:#334155}
+#zmf textarea{flex:1 1 auto;min-height:0;border:0;outline:0;resize:none;padding:12px 14px;background:#ffffff;color:#1e293b;border:1px solid #cbd5e1;font:14px/1.6 ui-monospace,Consolas,monospace;box-sizing:border-box}
+#zmf .c{flex:0 0 auto;padding:6px 14px;background:#e2e8f0;border-top:1px solid #cbd5e1;color:#64748b;font:12px/1.4 ui-monospace,Consolas,monospace;text-align:right}
 /* 保持朋友原来的左右对称 flex 布局和圆角拼接，避免 Outdent 与三角按钮产生间隙或错位。 */
-#zmf .f{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:#262b3b;border-top:1px solid #3a4055}
+#zmf .f{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:#f8fafc;border-top:1px solid #cbd5e1}
 #zmf .mid{display:flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto}
 #zmf .b,#zmf .ib,#zmf .db{border:0;font-size:13px;font-weight:600;cursor:pointer;color:#e6e9f0}
 #zmf .b{border-radius:999px;padding:8px 16px;background:#3a4055}
@@ -117,10 +117,10 @@
 #zmf .export-split>.ext-drop:hover{background:#0d9488}
 #zmf .export-split>.ext-drop:active{transform:translateY(1px)}
 #zmf .export-split .extmenu{right:0;left:auto;bottom:calc(100% + 8px);width:184px;min-width:184px;box-sizing:border-box;z-index:30}
-#zmf .ext-current{padding:4px 6px 7px;color:#94a3b8;border-bottom:1px solid #475169;font:12px/1.3 ui-monospace,Consolas,monospace}
-#zmf .extmenu .custom-ext{display:flex;align-items:center;gap:5px;margin-top:6px;padding-top:6px;border-top:1px solid #475169}
-#zmf .extmenu input{box-sizing:border-box;min-width:0;width:100%;height:30px;border:1px solid #475169;border-radius:6px;outline:0;padding:0 7px;background:#171a24;color:#e6e9f0;font:12px system-ui}
-#zmf .extmenu input:focus{border-color:#2dd4bf;box-shadow:0 0 0 2px rgba(45,212,191,.18)}
+#zmf .ext-current{padding:4px 6px 7px;color:#64748b;border-bottom:1px solid #e2e8f0;font:12px/1.3 ui-monospace,Consolas,monospace}
+#zmf .extmenu .custom-ext{display:flex;align-items:center;gap:5px;margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0}
+#zmf .extmenu input{box-sizing:border-box;min-width:0;width:100%;height:30px;border:1px solid #cbd5e1;border-radius:6px;outline:0;padding:0 7px;background:#ffffff;color:#334155;font:12px system-ui}
+#zmf .extmenu input:focus{border-color:#0ea5e9;box-shadow:0 0 0 2px rgba(14,165,233,.18)}
 #zmf .extmenu .custom-ok{display:flex;align-items:center;justify-content:center;width:42px;min-width:42px;padding:0!important;height:30px;background:#0e7490;border-radius:6px;text-align:center}
 #zmf .extmenu .custom-ok:hover{background:#155e75}
 /* 左右为胶囊组合：两枚主按钮加宽但保持 34px 高；左右三角独立配色。 */
@@ -136,10 +136,10 @@
 #zmf .outdent>.db{background:#7c3aed!important}
 #zmf .outdent>.db:hover{background:#8b5cf6!important}
 /* .f 不再建立定位/滚动容器；菜单以 #zmf 为定位上下文，并高于字符统计栏。 */
-#zmf .menu{position:absolute;bottom:54px;display:none;min-width:64px;padding:5px;background:#202635;border:1px solid #475169;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:20}
-#zmf .menu button{display:block;width:100%;border:0;border-radius:6px;padding:7px 10px;background:transparent;color:#e6e9f0;text-align:left;font:600 13px system-ui;cursor:pointer}
-#zmf .menu button:hover,#zmf .menu button.sel{background:#3a4055}
-#zmf .menu button.sel:after{content:'✓';float:right;color:#5eead4}
+#zmf .menu{position:absolute;bottom:54px;display:none;min-width:64px;padding:5px;background:#ffffff;border:1px solid #cbd5e1;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:20}
+#zmf .menu button{display:block;width:100%;border:0;border-radius:6px;padding:7px 10px;background:transparent;color:#334155;text-align:left;font:600 13px system-ui;cursor:pointer}
+#zmf .menu button:hover,#zmf .menu button.sel{background:#f1f5f9}
+#zmf .menu button.sel:after{content:'✓';float:right;color:#0ea5e9}
 #zmf .indent .menu{left:10px}
 #zmf .outdent .menu{right:10px}
 /* 清理围栏的模式菜单嵌入主按钮宽度内，不额外挤占底栏；当前选择由菜单中的 ✓ 标识。 */
@@ -149,18 +149,18 @@
 #zmf .clean-arrow:hover{background:rgba(81,45,0,.48)}
 #zmf .clean-split .cleanmenu{right:0;left:auto;bottom:calc(100% + 8px);width:196px;min-width:196px;box-sizing:border-box;z-index:30}
 /* 导入 Bottom Sheet：先由主按钮迅速打开面板，再由面板内的真实点击触发系统文件选择器。 */
-#zmf .sheet-backdrop{position:absolute;inset:0;z-index:100;display:flex;align-items:flex-end;background:rgba(7,10,18,.52);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease-out}
+#zmf .sheet-backdrop{position:absolute;inset:0;z-index:100;display:flex;align-items:flex-end;background:rgba(15,23,42,.4);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease-out}
 #zmf .sheet-backdrop.show{opacity:1;visibility:visible;pointer-events:auto}
-#zmf .import-sheet{width:100%;box-sizing:border-box;padding:10px 16px 16px;background:#2b3245;border-top:1px solid #56617b;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.3);transform:translateY(100%);transition:transform .18s ease-out}
+#zmf .import-sheet{width:100%;box-sizing:border-box;padding:10px 16px 16px;background:#f8fafc;border-top:1px solid #cbd5e1;border-radius:18px 18px 0 0;box-shadow:0 -10px 30px rgba(0,0,0,.1);transform:translateY(100%);transition:transform .18s ease-out}
 #zmf .sheet-backdrop.show .import-sheet{transform:translateY(0)}
-#zmf .sheet-handle{width:36px;height:4px;margin:0 auto 12px;border-radius:999px;background:#7b879f}
-#zmf .sheet-title{color:#f8fafc;font-size:16px;font-weight:750;text-align:center}
-#zmf .sheet-note{margin:6px 0 14px;color:#b6c0d0;font-size:12px;line-height:1.45;text-align:center}
+#zmf .sheet-handle{width:36px;height:4px;margin:0 auto 12px;border-radius:999px;background:#cbd5e1}
+#zmf .sheet-title{color:#1e293b;font-size:16px;font-weight:750;text-align:center}
+#zmf .sheet-note{margin:6px 0 14px;color:#64748b;font-size:12px;line-height:1.45;text-align:center}
 #zmf .sheet-primary,#zmf .sheet-secondary{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:40px;margin:0;border:0;border-radius:10px;font:700 14px system-ui;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #zmf .sheet-primary{background:#2563eb;color:#fff}
 #zmf .sheet-primary:hover{background:#1d4ed8}
-#zmf .sheet-secondary{margin-top:8px;background:#414a60;color:#e6e9f0}
-#zmf .sheet-secondary:hover{background:#4d5870}
+#zmf .sheet-secondary{margin-top:8px;background:#e2e8f0;color:#334155}
+#zmf .sheet-secondary:hover{background:#cbd5e1}
 `;
   (D.head || D.documentElement).appendChild(S);
 
@@ -1045,9 +1045,7 @@
 
   </script>
   <style id="standalone-workspace-theme">
-    /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。
-       本轮改为精致浅色皮肤：仅重设区块底色 / 边框 / 边缘 / 文字色，
-       8 个按钮 + 4 个下拉三角配色、按下反馈色一律保持不变。 */
+    /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。 */
     #zmf-launch { display: none !important; }
     #zmf {
       position: fixed !important;
@@ -1061,7 +1059,7 @@
       border-radius: 0 !important;
       box-shadow: none !important;
       background: transparent !important;
-      color: #1e293b;
+      color: #334155;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     #zmf .h {
@@ -1074,7 +1072,7 @@
       justify-content: flex-start;
       gap: 12px;
       background: transparent;
-      color: #0f172a;
+      color: #1e293b;
       font-size: clamp(20px, 2vw, 27px);
       font-weight: 760;
       letter-spacing: -.035em;
@@ -1087,11 +1085,11 @@
       align-items: center;
       height: 22px;
       padding: 0 9px;
-      border: 1px solid rgba(13, 148, 136, .38);
+      border: 1px solid rgba(13, 148, 136, .3);
       border-radius: 999px;
       color: #0f766e;
-      background: rgba(13, 148, 136, .10);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+      background: rgba(13, 148, 136, .08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .045em;
@@ -1099,7 +1097,7 @@
     }
     #zmf .x { display: none !important; }
 
-    /* 顶部功能区：浅色磨砂卡片，清晰边框与柔和投影，与页面底色明显分层。 */
+    /* 原底栏变为网页顶部的完整功能区。 */
     #zmf .f {
       order: 2;
       flex: 0 0 auto;
@@ -1110,10 +1108,10 @@
       padding: 11px 13px;
       align-items: center;
       gap: 16px;
-      border: 1px solid rgba(100, 116, 139, .30);
+      border: 1px solid rgba(148, 163, 184, .3);
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(240, 245, 251, .92));
-      box-shadow: 0 12px 26px rgba(15, 23, 42, .12), inset 0 1px 0 rgba(255,255,255,.7), inset 0 -1px 0 rgba(15,23,42,.05);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .85), rgba(241, 245, 249, .85));
+      box-shadow: 0 12px 30px rgba(0,0,0,.05), inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 0 rgba(0,0,0,.05);
       backdrop-filter: blur(18px);
     }
     #zmf .mid {
@@ -1135,8 +1133,7 @@
     #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
     #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
 
-    /* 缩进 / 反缩进有独立的按住反馈；脚本在 pointerdown 即加类、在抬起或取消时立刻移除。
-       —— 按下反馈色按要求保持不变。 */
+    /* 缩进 / 反缩进有独立的按住反馈；脚本在 pointerdown 即加类、在抬起或取消时立刻移除。 */
     #zmf .indent > .ib.is-pressed {
       background: #1d4ed8 !important;
       color: #fff !important;
@@ -1157,31 +1154,20 @@
       #zmf .outdent > .ib:hover:not(.is-pressed) { background: #dc2626 !important; }
     }
 
-    /* 下拉浮层：浅色卡片 + 深色文字，紧贴各自按钮下方。 */
+    /* 下拉菜单紧贴顶部功能区中的各自按钮，而不再从页面底部弹出。 */
     #zmf .menu {
       top: calc(100% + 8px);
       bottom: auto;
       z-index: 40;
-      border-color: rgba(148, 163, 184, .7);
+      border-color: rgba(203, 213, 225, .9);
       background: #ffffff;
-      box-shadow: 0 16px 32px rgba(15, 23, 42, .18), inset 0 1px 0 rgba(255,255,255,.9);
+      box-shadow: 0 12px 28px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,1);
     }
-    #zmf .menu button { color: #1e293b; }
-    #zmf .menu button:hover, #zmf .menu button.sel { background: #e2e8f0; }
-    #zmf .menu button.sel:after { color: #0d9488; }
-    #zmf .ext-current { color: #64748b; border-bottom-color: #e2e8f0; }
-    #zmf .extmenu .custom-ext { border-top-color: #e2e8f0; }
-    #zmf .extmenu input {
-      border-color: #cbd5e1;
-      background: #ffffff;
-      color: #1e293b;
-    }
-    #zmf .extmenu input:focus { border-color: #14b8a6; box-shadow: 0 0 0 2px rgba(20, 184, 166, .2); }
     #zmf .indent .menu { left: 0; }
     #zmf .outdent .menu { right: 0; }
     #zmf .export-split .extmenu, #zmf .clean-split .cleanmenu { top: calc(100% + 8px); bottom: auto; }
 
-    /* 编辑区：中浅色底、深色文字，边框 + 柔光凸显“大输入框”而不刺眼。 */
+    /* 编辑区占据页面主空间，以边框、内凹阴影和柔光形成有层次的“大输入框”。 */
     #zmf textarea {
       order: 3;
       flex: 1 1 auto;
@@ -1190,23 +1176,23 @@
       width: min(1440px, calc(100% - 48px));
       margin: 0 auto;
       padding: clamp(18px, 2.1vw, 30px);
-      border: 1px solid rgba(100, 116, 139, .34) !important;
+      border: 1px solid rgba(148, 163, 184, .4) !important;
       border-radius: 22px;
       outline: 0;
       background:
-        linear-gradient(115deg, #f7fafd, #eef3f9),
-        #f2f6fb;
+        linear-gradient(115deg, rgba(255, 255, 255, .9), rgba(248, 250, 252, .9)),
+        #f1f5f9;
       color: #1e293b;
-      box-shadow: 0 16px 38px rgba(15, 23, 42, .10), inset 0 1px 2px rgba(15, 23, 42, .05), inset 0 0 0 1px rgba(255,255,255,.5);
+      box-shadow: 0 12px 35px rgba(0,0,0,.04), inset 0 2px 4px rgba(0,0,0,.03), inset 0 0 0 1px rgba(255,255,255,.6), inset 0 18px 40px rgba(241, 245, 249, .4);
       font: 14px/1.72 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      caret-color: #0d9488;
+      caret-color: #0ea5e9;
       transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
     #zmf textarea::placeholder { color: #94a3b8; opacity: 1; }
     #zmf textarea:focus {
-      border-color: rgba(13, 148, 136, .6) !important;
-      background: linear-gradient(115deg, #f9fcfe, #eef4fa);
-      box-shadow: 0 16px 38px rgba(15, 23, 42, .10), inset 0 1px 2px rgba(15, 23, 42, .05), 0 0 0 3px rgba(20, 184, 166, .16);
+      border-color: rgba(14, 165, 233, .5) !important;
+      background: linear-gradient(115deg, #ffffff, #f8fafc);
+      box-shadow: 0 12px 35px rgba(0,0,0,.06), inset 0 2px 4px rgba(0,0,0,.03), inset 0 0 0 3px rgba(14, 165, 233, .15), 0 0 0 1px rgba(14, 165, 233, .2);
     }
     #zmf .c {
       order: 4;
@@ -1217,24 +1203,12 @@
       padding: 11px 5px 0;
       border: 0;
       background: transparent;
-      color: #475569;
+      color: #64748b;
       font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       text-align: right;
     }
-    #zmf .c b { color: #1e293b; font-weight: 700; }
-
-    /* 导入底部面板：浅色卡片，文字与句柄同步转深色以便辨认。 */
-    #zmf .sheet-backdrop { position: fixed; background: rgba(15, 23, 42, .34); }
-    #zmf .import-sheet {
-      background: #f4f7fb;
-      border-top-color: #cbd5e1;
-      box-shadow: 0 -10px 30px rgba(15, 23, 42, .16);
-    }
-    #zmf .sheet-handle { background: #94a3b8; }
-    #zmf .sheet-title { color: #0f172a; }
-    #zmf .sheet-note { color: #475569; }
-    #zmf .sheet-secondary { background: #e2e8f0; color: #1e293b; }
-    #zmf .sheet-secondary:hover { background: #cbd5e1; }
+    #zmf .c b { color: #334155; font-weight: 700; }
+    #zmf .sheet-backdrop { position: fixed; }
 
     @media (max-width: 1120px) {
       #zmf .f { gap: 11px; }
