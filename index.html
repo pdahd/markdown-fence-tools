@@ -4,25 +4,55 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <title>Markdown 代码围栏工具</title>
+  <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
+  <title>Markdown 围栏工作台</title>
   <style>
-    html,body{min-height:100%;margin:0}
-    body{overflow:hidden;background:radial-gradient(circle at 20% 0,#164e63 0,transparent 38%),radial-gradient(circle at 90% 100%,#312e81 0,transparent 42%),#0b1020;color:#e6e9f0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-    .page-note{position:fixed;z-index:1;left:50%;bottom:2.5vh;max-width:min(90vw,680px);transform:translateX(-50%);color:#94a3b8;font-size:12px;line-height:1.5;text-align:center;pointer-events:none}
-    .page-note kbd{padding:1px 5px;border:1px solid #475569;border-radius:4px;background:#1e293b;color:#e2e8f0;font:11px ui-monospace,Consolas,monospace}
-    noscript{display:block;margin:20px;color:#fecaca}
+    :root {
+      color-scheme: dark;
+      background: #07111f;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    html, body { width: 100%; min-height: 100%; margin: 0; overflow: hidden; }
+    body {
+      background:
+        radial-gradient(900px 600px at -10% -16%, rgba(20, 184, 166, .20), transparent 66%),
+        radial-gradient(800px 540px at 110% 0%, rgba(59, 130, 246, .22), transparent 66%),
+        linear-gradient(145deg, #06101c 0%, #0c1629 52%, #101426 100%);
+      color: #e9f2ff;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .32;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, #000, transparent 88%);
+    }
+    noscript {
+      display: block;
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+      margin: 52px auto;
+      padding: 18px 22px;
+      border: 1px solid rgba(251, 113, 133, .45);
+      border-radius: 14px;
+      color: #fecdd3;
+      background: rgba(76, 5, 25, .65);
+    }
   </style>
 </head>
 <body>
   <noscript>此工具需要启用 JavaScript。</noscript>
-  <div class="page-note">Markdown 代码围栏工具独立版 · 面板自动打开 · <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>M</kbd> 可切换面板</div>
   <script>
-    // 独立页嵌入与 panel.js 相同的运行时，因此即使直接打开 index.html 也无需额外网络请求。
+    // 独立页嵌入与 panel.js 相同的运行时，直接打开 index.html 也不需要额外网络请求。
     window.__MDFenceToolsAutoOpen = true;
 /*
  * Markdown Fence Tools panel runtime
  * Version: 1.9.1
- * Used by the standalone GitHub Pages page and by the remote bookmarklet loader.
+ * Used by the remote bookmarklet loader and embedded into the standalone GitHub Pages page during its build.
  * Uses DOM node APIs rather than innerHTML so it remains compatible with YouTube Trusted Types.
  */
 
@@ -1013,5 +1043,212 @@
 })();
 
   </script>
-</body>
+  <style id="standalone-workspace-theme">
+    /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。 */
+    #zmf-launch { display: none !important; }
+    #zmf {
+      position: fixed !important;
+      inset: 0 !important;
+      width: auto !important;
+      height: auto !important;
+      display: flex !important;
+      flex-direction: column;
+      overflow: hidden !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      color: #e9f2ff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #zmf .h {
+      order: 1;
+      flex: 0 0 62px;
+      box-sizing: border-box;
+      width: min(1440px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 17px 6px 9px;
+      justify-content: flex-start;
+      gap: 12px;
+      background: transparent;
+      color: #f6fbff;
+      font-size: clamp(20px, 2vw, 27px);
+      font-weight: 760;
+      letter-spacing: -.035em;
+      cursor: default;
+      touch-action: auto;
+    }
+    #zmf .h > span:first-child { white-space: nowrap; }
+    #zmf .site-kicker {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 9px;
+      border: 1px solid rgba(94, 234, 212, .26);
+      border-radius: 999px;
+      color: #99f6e4;
+      background: rgba(13, 148, 136, .12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+    }
+    #zmf .x { display: none !important; }
+
+    /* 原底栏变为网页顶部的完整功能区。 */
+    #zmf .f {
+      order: 2;
+      flex: 0 0 auto;
+      box-sizing: border-box;
+      width: min(1440px, calc(100% - 48px));
+      min-height: 70px;
+      margin: 0 auto 16px;
+      padding: 11px 13px;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid rgba(148, 163, 184, .20);
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(30, 41, 59, .90), rgba(19, 30, 49, .90));
+      box-shadow: 0 16px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.32);
+      backdrop-filter: blur(18px);
+    }
+    #zmf .mid {
+      flex: 1 1 auto;
+      justify-content: center;
+      gap: 9px;
+    }
+    #zmf .indent, #zmf .outdent { position: relative; flex: 0 0 auto; }
+    #zmf .b, #zmf .ib, #zmf .db { font-size: 14px; }
+    #zmf .indent > .ib, #zmf .indent > .db, #zmf .outdent > .ib, #zmf .outdent > .db {
+      height: 42px !important;
+      min-height: 42px !important;
+      max-height: 42px !important;
+    }
+    #zmf .ib { padding: 0 22px !important; }
+    #zmf .db { width: 40px !important; min-width: 40px !important; }
+    #zmf .mid .b, #zmf .mid .text-convert { min-height: 42px; padding-top: 10px; padding-bottom: 10px; }
+    #zmf .mid .clean-main { min-height: 42px; }
+    #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
+    #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
+
+    /* 下拉菜单紧贴顶部功能区中的各自按钮，而不再从页面底部弹出。 */
+    #zmf .menu {
+      top: calc(100% + 8px);
+      bottom: auto;
+      z-index: 40;
+      border-color: rgba(100, 116, 139, .8);
+      background: #182338;
+      box-shadow: 0 16px 32px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    #zmf .indent .menu { left: 0; }
+    #zmf .outdent .menu { right: 0; }
+    #zmf .export-split .extmenu, #zmf .clean-split .cleanmenu { top: calc(100% + 8px); bottom: auto; }
+
+    /* 编辑区占据页面主空间，以边框、内凹阴影和柔光形成有层次的“大输入框”。 */
+    #zmf textarea {
+      order: 3;
+      flex: 1 1 auto;
+      min-height: 0;
+      box-sizing: border-box;
+      width: min(1440px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: clamp(18px, 2.1vw, 30px);
+      border: 1px solid rgba(125, 211, 252, .22) !important;
+      border-radius: 22px;
+      outline: 0;
+      background:
+        linear-gradient(115deg, rgba(18, 31, 52, .98), rgba(10, 19, 35, .98)),
+        #0a1324;
+      color: #e7f0fc;
+      box-shadow: 0 24px 55px rgba(0,0,0,.28), inset 0 2px 2px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.025), inset 0 18px 50px rgba(2, 6, 23, .22);
+      font: 14px/1.72 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      caret-color: #67e8f9;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+    #zmf textarea::placeholder { color: #71819b; opacity: 1; }
+    #zmf textarea:focus {
+      border-color: rgba(45, 212, 191, .68) !important;
+      background: linear-gradient(115deg, rgba(17, 37, 58, .99), rgba(9, 20, 37, .99));
+      box-shadow: 0 24px 55px rgba(0,0,0,.28), inset 0 2px 2px rgba(0,0,0,.35), inset 0 0 0 3px rgba(20, 184, 166, .12), 0 0 0 1px rgba(45,212,191,.10);
+    }
+    #zmf .c {
+      order: 4;
+      flex: 0 0 41px;
+      box-sizing: border-box;
+      width: min(1440px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 11px 5px 0;
+      border: 0;
+      background: transparent;
+      color: #8fa2bc;
+      font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-align: right;
+    }
+    #zmf .c b { color: #c7d6e9; font-weight: 700; }
+    #zmf .sheet-backdrop { position: fixed; }
+
+    @media (max-width: 1120px) {
+      #zmf .f { gap: 11px; }
+      #zmf .mid { gap: 7px; }
+      #zmf .ib { padding: 0 17px !important; }
+      #zmf .mid .b { padding-left: 12px; padding-right: 12px; }
+    }
+    @media (max-width: 880px) {
+      #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 28px); }
+      #zmf .h { flex-basis: 56px; padding-top: 13px; font-size: 21px; }
+      #zmf .f {
+        margin-bottom: 12px;
+        padding: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        /* 不裁切下拉菜单；窄屏时工具区自然换行。 */
+        overflow: visible;
+      }
+      #zmf .mid { order: 1; flex: 1 0 100%; flex-wrap: wrap; }
+      #zmf .indent { order: 2; }
+      #zmf .outdent { order: 3; }
+      #zmf textarea { border-radius: 18px; }
+    }
+    @media (max-width: 560px) {
+      #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 20px); }
+      #zmf .h { gap: 8px; font-size: 19px; }
+      #zmf .site-kicker { padding: 0 7px; font-size: 10px; }
+      #zmf .f { min-height: 114px; padding: 9px 7px; gap: 8px; }
+      #zmf .mid { gap: 6px; }
+      #zmf .mid .b { min-width: 66px; padding-left: 10px; padding-right: 10px; font-size: 13px; }
+      #zmf .mid .clean-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
+      #zmf .export-split > .b { min-width: 88px; }
+      #zmf .indent > .ib, #zmf .outdent > .ib { padding: 0 17px !important; }
+      #zmf textarea { padding: 16px; font-size: 13px; line-height: 1.65; }
+      #zmf .c { flex-basis: 34px; padding-top: 8px; }
+    }
+  </style>
+  <script>
+    // 独立页特有的小增强：更换品牌标题，并禁用悬浮面板的拖动/折叠快捷键。
+    (function () {
+      var panel = document.getElementById('zmf');
+      if (!panel) return;
+      var header = panel.querySelector('.h');
+      var title = header && header.querySelector('span');
+      if (title) title.textContent = 'Markdown 围栏工作台';
+      if (header) {
+        var badge = document.createElement('span');
+        badge.className = 'site-kicker';
+        badge.textContent = '独立编辑空间';
+        header.appendChild(badge);
+        header.addEventListener('pointerdown', function (event) {
+          if (!event.target.closest('.x')) event.stopImmediatePropagation();
+        }, true);
+        header.addEventListener('dblclick', function (event) { event.stopImmediatePropagation(); }, true);
+      }
+      document.addEventListener('keydown', function (event) {
+        if (event.ctrlKey && event.altKey && String(event.key).toLowerCase() === 'm') {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    })();
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38b97893819b0ae',t:'MTc4OTAxMzUyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
