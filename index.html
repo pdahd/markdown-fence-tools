@@ -3,31 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="light">
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
   <meta name="md-fence-tools-standalone-version" content="2.0.1">
   <title>Markdown 围栏工作台 · v2.0.1</title>
   <style>
     :root {
-      color-scheme: dark;
-      background: #07111f;
+      color-scheme: light;
+      background: #c3cedc;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     html, body { width: 100%; min-height: 100%; margin: 0; overflow: hidden; }
     body {
       background:
-        radial-gradient(900px 600px at -10% -16%, rgba(20, 184, 166, .20), transparent 66%),
-        radial-gradient(800px 540px at 110% 0%, rgba(59, 130, 246, .22), transparent 66%),
-        linear-gradient(145deg, #06101c 0%, #0c1629 52%, #101426 100%);
-      color: #e9f2ff;
+        radial-gradient(900px 600px at -10% -16%, rgba(13, 148, 136, .16), transparent 66%),
+        radial-gradient(800px 540px at 110% 0%, rgba(37, 99, 235, .13), transparent 66%),
+        linear-gradient(145deg, #b7c4d4 0%, #c5d0de 52%, #d0d7e2 100%);
+      color: #1e293b;
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .32;
-      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      opacity: .55;
+      background-image: linear-gradient(rgba(15, 36, 64, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 36, 64, .055) 1px, transparent 1px);
       background-size: 28px 28px;
       mask-image: linear-gradient(to bottom, #000, transparent 88%);
     }
@@ -38,10 +38,10 @@
       max-width: 720px;
       margin: 52px auto;
       padding: 18px 22px;
-      border: 1px solid rgba(251, 113, 133, .45);
+      border: 1px solid rgba(185, 28, 28, .35);
       border-radius: 14px;
-      color: #fecdd3;
-      background: rgba(76, 5, 25, .65);
+      color: #7f1d1d;
+      background: rgba(254, 226, 226, .92);
     }
   </style>
 </head>
@@ -1059,7 +1059,7 @@
       border-radius: 0 !important;
       box-shadow: none !important;
       background: transparent !important;
-      color: #e9f2ff;
+      color: #1e293b;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     #zmf .h {
@@ -1072,7 +1072,7 @@
       justify-content: flex-start;
       gap: 12px;
       background: transparent;
-      color: #f6fbff;
+      color: #10243f;
       font-size: clamp(20px, 2vw, 27px);
       font-weight: 760;
       letter-spacing: -.035em;
@@ -1085,11 +1085,11 @@
       align-items: center;
       height: 22px;
       padding: 0 9px;
-      border: 1px solid rgba(94, 234, 212, .26);
+      border: 1px solid rgba(13, 148, 136, .42);
       border-radius: 999px;
-      color: #99f6e4;
-      background: rgba(13, 148, 136, .12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+      color: #0f766e;
+      background: rgba(204, 251, 241, .78);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: .045em;
@@ -1108,10 +1108,10 @@
       padding: 11px 13px;
       align-items: center;
       gap: 16px;
-      border: 1px solid rgba(148, 163, 184, .20);
+      border: 1px solid #7d93ad;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(30, 41, 59, .90), rgba(19, 30, 49, .90));
-      box-shadow: 0 16px 30px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.32);
+      background: linear-gradient(180deg, #eef3f8 0%, #e2eaf3 100%);
+      box-shadow: 0 10px 24px rgba(30, 58, 95, .12), inset 0 1px 0 rgba(255,255,255,.88), inset 0 -1px 0 rgba(90, 115, 145, .16);
       backdrop-filter: blur(18px);
     }
     #zmf .mid {
@@ -1159,9 +1159,24 @@
       top: calc(100% + 8px);
       bottom: auto;
       z-index: 40;
-      border-color: rgba(100, 116, 139, .8);
-      background: #182338;
-      box-shadow: 0 16px 32px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+      border-color: #8aa0b8;
+      background: #f4f7fb;
+      box-shadow: 0 16px 32px rgba(30, 58, 95, .18), inset 0 1px 0 rgba(255,255,255,.85);
+      color: #1e293b;
+    }
+    #zmf .menu button { color: #1e293b; }
+    #zmf .menu button:hover,
+    #zmf .menu button.sel { background: #d7e2ee; }
+    #zmf .menu button.sel:after { color: #0f766e; }
+    #zmf .ext-current {
+      color: #4d6178;
+      border-bottom-color: #c5d0de;
+    }
+    #zmf .extmenu .custom-ext { border-top-color: #c5d0de; }
+    #zmf .extmenu input {
+      background: #ffffff;
+      color: #1e293b;
+      border-color: #8aa0b8;
     }
     #zmf .indent .menu { left: 0; }
     #zmf .outdent .menu { right: 0; }
@@ -1176,23 +1191,21 @@
       width: min(1440px, calc(100% - 48px));
       margin: 0 auto;
       padding: clamp(18px, 2.1vw, 30px);
-      border: 1px solid rgba(125, 211, 252, .22) !important;
+      border: 1.5px solid #6d86a2 !important;
       border-radius: 22px;
       outline: 0;
-      background:
-        linear-gradient(115deg, rgba(18, 31, 52, .98), rgba(10, 19, 35, .98)),
-        #0a1324;
-      color: #e7f0fc;
-      box-shadow: 0 24px 55px rgba(0,0,0,.28), inset 0 2px 2px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.025), inset 0 18px 50px rgba(2, 6, 23, .22);
+      background: linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+      color: #1a3048;
+      box-shadow: 0 16px 36px rgba(30, 58, 95, .12), inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 1px rgba(255,255,255,.4);
       font: 14px/1.72 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      caret-color: #67e8f9;
+      caret-color: #0f766e;
       transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
-    #zmf textarea::placeholder { color: #71819b; opacity: 1; }
+    #zmf textarea::placeholder { color: #7b8fa6; opacity: 1; }
     #zmf textarea:focus {
-      border-color: rgba(45, 212, 191, .68) !important;
-      background: linear-gradient(115deg, rgba(17, 37, 58, .99), rgba(9, 20, 37, .99));
-      box-shadow: 0 24px 55px rgba(0,0,0,.28), inset 0 2px 2px rgba(0,0,0,.35), inset 0 0 0 3px rgba(20, 184, 166, .12), 0 0 0 1px rgba(45,212,191,.10);
+      border-color: #0d9488 !important;
+      background: #fbfcfe;
+      box-shadow: 0 16px 36px rgba(30, 58, 95, .12), inset 0 1px 0 rgba(255,255,255,.9), inset 0 0 0 3px rgba(13, 148, 136, .12), 0 0 0 1px rgba(13, 148, 136, .18);
     }
     #zmf .c {
       order: 4;
@@ -1203,12 +1216,22 @@
       padding: 11px 5px 0;
       border: 0;
       background: transparent;
-      color: #8fa2bc;
+      color: #4d6178;
       font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       text-align: right;
     }
-    #zmf .c b { color: #c7d6e9; font-weight: 700; }
-    #zmf .sheet-backdrop { position: fixed; }
+    #zmf .c b { color: #1e3a5f; font-weight: 700; }
+    #zmf .sheet-backdrop { position: fixed; background: rgba(30, 45, 64, .38); }
+    #zmf .import-sheet {
+      background: #eef3f8;
+      border-top: 1px solid #8aa0b8;
+      box-shadow: 0 -10px 30px rgba(30, 58, 95, .18);
+    }
+    #zmf .sheet-handle { background: #93a4b8; }
+    #zmf .sheet-title { color: #10243f; }
+    #zmf .sheet-note { color: #4d6178; }
+    #zmf .sheet-secondary { background: #c5d0de; color: #1e293b; }
+    #zmf .sheet-secondary:hover { background: #b4c2d4; }
 
     @media (max-width: 1120px) {
       #zmf .f { gap: 11px; }
