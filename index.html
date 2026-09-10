@@ -1146,6 +1146,13 @@
       box-shadow: inset 0 2px 8px rgba(69, 10, 10, .48), 0 0 0 2px rgba(252, 113, 113, .26) !important;
       filter: saturate(1.16) brightness(.94);
     }
+    /* 触屏设备抬起手指后 :hover 会一直残留，而共享样式里的 hover 色与按住色相同，
+       导致 .is-pressed 已移除仍显示深色。此处仅在不支持真实悬停的设备上，
+       让未按下状态的 hover 回到原色；桌面鼠标的悬停效果不受影响。 */
+    @media (hover: none) {
+      #zmf .indent > .ib:hover:not(.is-pressed) { background: #2563eb !important; }
+      #zmf .outdent > .ib:hover:not(.is-pressed) { background: #dc2626 !important; }
+    }
 
     /* 下拉菜单紧贴顶部功能区中的各自按钮，而不再从页面底部弹出。 */
     #zmf .menu {
