@@ -10,25 +10,26 @@
   <style>
     :root {
       color-scheme: dark;
-      background: #181a1f;
+      background: #232323;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     html, body { width: 100%; min-height: 100%; margin: 0; overflow: hidden; }
     body {
       background:
-        radial-gradient(1000px 600px at 50% -10%, rgba(255, 255, 255, .03), transparent 70%),
-        linear-gradient(180deg, #1d1f26 0%, #17181d 100%);
-      color: #d1d5db;
+        radial-gradient(1000px 640px at -12% -18%, rgba(255,255,255,.05), transparent 62%),
+        radial-gradient(820px 560px at 112% 0%, rgba(255,255,255,.035), transparent 64%),
+        linear-gradient(160deg, #2e2e2e 0%, #242424 48%, #1b1b1b 100%);
+      color: #e8e8e8;
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .2;
+      opacity: .28;
       background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
-      background-size: 24px 24px;
-      mask-image: linear-gradient(to bottom, #000, transparent 90%);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, #000, transparent 88%);
     }
     noscript {
       display: block;
@@ -37,10 +38,11 @@
       max-width: 720px;
       margin: 52px auto;
       padding: 18px 22px;
-      border: 1px solid rgba(239, 68, 68, .45);
-      border-radius: 12px;
-      color: #fca5a5;
-      background: rgba(69, 10, 10, .75);
+      border: 1px solid rgba(248, 113, 113, .5);
+      border-radius: 14px;
+      color: #fecaca;
+      background: rgba(64, 30, 30, .9);
+      box-shadow: 0 10px 24px rgba(0,0,0,.32);
     }
   </style>
 </head>
@@ -1044,7 +1046,9 @@
 
   </script>
   <style id="standalone-workspace-theme">
-    /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。 */
+    /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。
+       Premiere Pro 风格灰色主题：仅重设区块底色 / 边框 / 阴影 / 文字色，
+       8 个主按钮 + 4 个下拉三角配色与按下反馈一律保持共享运行时原样。 */
     #zmf-launch { display: none !important; }
     #zmf {
       position: fixed !important;
@@ -1058,23 +1062,24 @@
       border-radius: 0 !important;
       box-shadow: none !important;
       background: transparent !important;
-      color: #e5e7eb;
+      color: #e6e6e6;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     #zmf .h {
       order: 1;
-      flex: 0 0 58px;
+      flex: 0 0 62px;
       box-sizing: border-box;
       width: min(1440px, calc(100% - 48px));
       margin: 0 auto;
-      padding: 16px 6px 8px;
+      padding: 17px 6px 9px;
       justify-content: flex-start;
       gap: 12px;
       background: transparent;
-      color: #f3f4f6;
-      font-size: clamp(20px, 2vw, 26px);
+      color: #f2f2f2;
+      font-size: clamp(20px, 2vw, 27px);
       font-weight: 760;
-      letter-spacing: -.03em;
+      letter-spacing: -.035em;
+      text-shadow: 0 1px 2px rgba(0,0,0,.45);
       cursor: default;
       touch-action: auto;
     }
@@ -1084,19 +1089,19 @@
       align-items: center;
       height: 22px;
       padding: 0 9px;
-      border: 1px solid rgba(56, 189, 248, .35);
+      border: 1px solid #5c5c5c;
       border-radius: 999px;
-      color: #38bdf8;
-      background: rgba(14, 165, 233, .12);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      color: #d8d8d8;
+      background: linear-gradient(180deg, #4a4a4a, #3a3a3a);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.3);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: .04em;
+      letter-spacing: .045em;
       text-transform: uppercase;
     }
     #zmf .x { display: none !important; }
 
-    /* 原底栏变为网页顶部的完整功能区（Adobe Premiere 风格面板容器） */
+    /* 顶部工具条：Premiere 式中灰面板，明确 1px 亮边 + 顶部高光 + 底部压暗 + 外圈深色描边。 */
     #zmf .f {
       order: 2;
       flex: 0 0 auto;
@@ -1107,11 +1112,15 @@
       padding: 11px 13px;
       align-items: center;
       gap: 16px;
-      border: 1.5px solid #3d424d;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #272a32 0%, #20232a 100%);
-      box-shadow: 0 12px 28px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.35);
-      backdrop-filter: blur(12px);
+      border: 1px solid #565656;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #3d3d3d, #323232);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.38),
+        0 0 0 1px rgba(0,0,0,.4),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 -1px 0 rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
     }
     #zmf .mid {
       flex: 1 1 auto;
@@ -1132,7 +1141,7 @@
     #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
     #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
 
-    /* 缩进 / 反缩进有独立的按住反馈；脚本在 pointerdown 即加类、在抬起或取消时立刻移除。 */
+    /* 缩进 / 反缩进按住反馈色保持朋友原值，不改动。 */
     #zmf .indent > .ib.is-pressed {
       background: #1d4ed8 !important;
       color: #fff !important;
@@ -1153,48 +1162,40 @@
       #zmf .outdent > .ib:hover:not(.is-pressed) { background: #dc2626 !important; }
     }
 
-    /* 下拉菜单紧贴顶部功能区中的各自按钮，而不再从页面底部弹出。 */
+    /* 下拉菜单：灰色浮层，1px 亮边 + 深色外描边，与工具条拉开层次。 */
     #zmf .menu {
       top: calc(100% + 8px);
       bottom: auto;
       z-index: 40;
-      border: 1px solid #4d5464;
-      background: #252830;
-      box-shadow: 0 14px 34px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.07);
+      border: 1px solid #5a5a5a;
+      background: linear-gradient(180deg, #3f3f3f, #343434);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.42),
+        0 0 0 1px rgba(0,0,0,.4),
+        inset 0 1px 0 rgba(255,255,255,.07);
     }
-    #zmf .menu button {
-      color: #e5e7eb;
-    }
-    #zmf .menu button:hover, #zmf .menu button.sel {
-      background: #373c47;
-    }
-    #zmf .menu button.sel:after {
-      color: #38bdf8;
-    }
-    #zmf .ext-current {
-      color: #9ca3af;
-      border-bottom-color: #424855;
-    }
-    #zmf .extmenu input {
-      border: 1px solid #4d5464;
-      background: #1b1d22;
-      color: #f3f4f6;
-    }
-    #zmf .extmenu input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 2px rgba(56, 189, 248, .22);
-    }
-    #zmf .extmenu .custom-ok {
-      background: #0284c7;
-    }
-    #zmf .extmenu .custom-ok:hover {
-      background: #0369a1;
-    }
+    #zmf .menu button { color: #ececec; text-shadow: 0 1px 1px rgba(0,0,0,.4); }
+    #zmf .menu button:hover, #zmf .menu button.sel { background: #4d4d4d; }
+    #zmf .menu button.sel:after { color: #9ecbff; }
     #zmf .indent .menu { left: 0; }
     #zmf .outdent .menu { right: 0; }
     #zmf .export-split .extmenu, #zmf .clean-split .cleanmenu { top: calc(100% + 8px); bottom: auto; }
+    #zmf .ext-current { color: #b9b9b9; border-bottom-color: #565656; }
+    #zmf .extmenu .custom-ext { border-top-color: #565656; }
+    #zmf .extmenu input {
+      border: 1px solid #666666;
+      background: #2b2b2b;
+      color: #f0f0f0;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+    }
+    #zmf .extmenu input::placeholder { color: #9a9a9a; }
+    #zmf .extmenu input:focus {
+      border-color: #909090;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,.35), 0 0 0 2px rgba(255,255,255,.10);
+    }
 
-    /* 编辑区占据页面主空间：中灰色内部底色，加粗 2px 明确边框与内阴影 */
+    /* 文本编辑区：单独的中灰色内部（明显浅于界面其它区块），
+       加粗 2px 亮灰边框 + 外圈深色压边 + 内凹阴影，保证输入框显眼、边缘一眼可辨。 */
     #zmf textarea {
       order: 3;
       flex: 1 1 auto;
@@ -1203,49 +1204,62 @@
       width: min(1440px, calc(100% - 48px));
       margin: 0 auto;
       padding: clamp(18px, 2.1vw, 30px);
-      border: 2px solid #545b6a !important;
-      border-radius: 18px;
+      border: 2px solid #7d7d7d !important;
+      border-radius: 22px;
       outline: 0;
-      background: #2e323b;
-      color: #f3f6fc;
-      box-shadow: 0 16px 36px rgba(0,0,0,.35), inset 0 2px 6px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.04);
+      background:
+        linear-gradient(180deg, #626262, #585858),
+        #5c5c5c;
+      color: #fafafa;
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.4),
+        0 0 0 1px rgba(0,0,0,.5),
+        inset 0 2px 8px rgba(0,0,0,.28),
+        inset 0 0 0 1px rgba(255,255,255,.05);
       font: 14px/1.72 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      caret-color: #38bdf8;
+      caret-color: #ffffff;
+      text-shadow: 0 1px 1px rgba(0,0,0,.18);
       transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
-    #zmf textarea::placeholder { color: #8a92a3; opacity: 1; }
+    #zmf textarea::placeholder { color: #d2d2d2; opacity: 1; }
     #zmf textarea:focus {
-      border-color: #38bdf8 !important;
-      background: #333842;
-      box-shadow: 0 16px 36px rgba(0,0,0,.4), inset 0 2px 6px rgba(0,0,0,.45), 0 0 0 3px rgba(56, 189, 248, .24) !important;
+      border-color: #a6a6a6 !important;
+      background:
+        linear-gradient(180deg, #686868, #5d5d5d),
+        #626262;
+      box-shadow:
+        0 18px 40px rgba(0,0,0,.4),
+        0 0 0 1px rgba(0,0,0,.5),
+        0 0 0 4px rgba(255,255,255,.10),
+        inset 0 2px 8px rgba(0,0,0,.26),
+        inset 0 0 0 1px rgba(255,255,255,.06);
     }
     #zmf .c {
       order: 4;
-      flex: 0 0 40px;
+      flex: 0 0 41px;
       box-sizing: border-box;
       width: min(1440px, calc(100% - 48px));
       margin: 0 auto;
-      padding: 10px 6px 0;
+      padding: 11px 5px 0;
       border: 0;
       background: transparent;
-      color: #9ca3af;
+      color: #b3b3b3;
       font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       text-align: right;
+      text-shadow: 0 1px 1px rgba(0,0,0,.35);
     }
-    #zmf .c b { color: #d1d5db; font-weight: 700; }
-    #zmf .sheet-backdrop { position: fixed; background: rgba(12, 14, 18, .62); }
+    #zmf .c b { color: #f2f2f2; font-weight: 700; }
+
+    /* 导入底部面板：灰色容器 + 明确顶边；内部两个按钮沿用共享运行时配色，未做改动。 */
+    #zmf .sheet-backdrop { position: fixed; background: rgba(0,0,0,.5); }
     #zmf .import-sheet {
-      background: #242730;
-      border-top: 1.5px solid #4a5160;
-      box-shadow: 0 -12px 36px rgba(0,0,0,.5);
+      background: linear-gradient(180deg, #3c3c3c, #303030);
+      border-top: 1px solid #5c5c5c;
+      box-shadow: 0 -10px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
     }
-    #zmf .sheet-handle { background: #5d6678; }
-    #zmf .sheet-title { color: #f3f4f6; }
-    #zmf .sheet-note { color: #9ca3af; }
-    #zmf .sheet-primary { background: #2563eb; color: #fff; }
-    #zmf .sheet-primary:hover { background: #1d4ed8; }
-    #zmf .sheet-secondary { background: #393e4d; color: #e5e7eb; }
-    #zmf .sheet-secondary:hover { background: #454b5c; }
+    #zmf .sheet-handle { background: #8c8c8c; }
+    #zmf .sheet-title { color: #f4f4f4; text-shadow: 0 1px 1px rgba(0,0,0,.4); }
+    #zmf .sheet-note { color: #c6c6c6; }
 
     @media (max-width: 1120px) {
       #zmf .f { gap: 11px; }
@@ -1255,7 +1269,7 @@
     }
     @media (max-width: 880px) {
       #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 28px); }
-      #zmf .h { flex-basis: 54px; padding-top: 12px; font-size: 20px; }
+      #zmf .h { flex-basis: 56px; padding-top: 13px; font-size: 21px; }
       #zmf .f {
         margin-bottom: 12px;
         padding: 10px;
@@ -1267,11 +1281,11 @@
       #zmf .mid { order: 1; flex: 1 0 100%; flex-wrap: wrap; }
       #zmf .indent { order: 2; }
       #zmf .outdent { order: 3; }
-      #zmf textarea { border-radius: 14px; }
+      #zmf textarea { border-radius: 18px; }
     }
     @media (max-width: 560px) {
       #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 20px); }
-      #zmf .h { gap: 8px; font-size: 18px; }
+      #zmf .h { gap: 8px; font-size: 19px; }
       #zmf .site-kicker { padding: 0 7px; font-size: 10px; }
       #zmf .f { min-height: 114px; padding: 9px 7px; gap: 8px; }
       #zmf .mid { gap: 6px; }
@@ -1279,7 +1293,7 @@
       #zmf .mid .clean-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
       #zmf .export-split > .b { min-width: 88px; }
       #zmf .indent > .ib, #zmf .outdent > .ib { padding: 0 17px !important; }
-      #zmf textarea { padding: 14px; font-size: 13px; line-height: 1.65; }
+      #zmf textarea { padding: 16px; font-size: 13px; line-height: 1.65; }
       #zmf .c { flex-basis: 34px; padding-top: 8px; }
     }
   </style>
