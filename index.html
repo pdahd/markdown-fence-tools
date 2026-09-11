@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
-  <meta name="md-fence-tools-standalone-version" content="2.0.1">
-  <title>Markdown 围栏工作台 · v2.0.1</title>
+  <meta name="md-fence-tools-standalone-version" content="2.0.2">
+  <title>Markdown 围栏工作台 · v2.0.2</title>
   <style>
     :root {
       color-scheme: dark;
@@ -1127,6 +1127,72 @@
       justify-content: center;
       gap: 9px;
     }
+
+    /* 仅控制编辑器的视觉换行；默认关闭，切换时不会改写 textarea 的任何文本。 */
+    #zmf .wrap-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      box-sizing: border-box;
+      min-height: 42px;
+      margin: 0;
+      padding: 6px 10px 6px 12px;
+      border: 1px solid #606060;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #474747, #3a3a3a);
+      color: #ececec;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.36);
+      font: 700 13px/1 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      white-space: nowrap;
+      cursor: pointer;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+    #zmf .wrap-toggle:hover { filter: brightness(1.12); }
+    #zmf .wrap-toggle:active { transform: translateY(1px); }
+    #zmf .wrap-toggle:focus-visible {
+      outline: 2px solid #9ecbff;
+      outline-offset: 2px;
+    }
+    #zmf .wrap-toggle__track {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
+      width: 34px;
+      height: 20px;
+      padding: 2px;
+      border: 1px solid #202020;
+      border-radius: 999px;
+      background: #252525;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,.48), 0 1px 0 rgba(255,255,255,.08);
+      transition: background .16s ease, border-color .16s ease;
+    }
+    #zmf .wrap-toggle__thumb {
+      display: block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #b8b8b8;
+      box-shadow: 0 1px 2px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.28);
+      transform: translateX(0);
+      transition: transform .16s ease, background .16s ease;
+    }
+    #zmf .wrap-toggle[aria-checked="true"] {
+      border-color: #3979c4;
+      background: linear-gradient(180deg, #315c91, #294d79);
+    }
+    #zmf .wrap-toggle[aria-checked="true"] .wrap-toggle__track {
+      border-color: #1d4f85;
+      background: #0f65b9;
+    }
+    #zmf .wrap-toggle[aria-checked="true"] .wrap-toggle__thumb {
+      background: #ffffff;
+      transform: translateX(14px);
+    }
     #zmf .indent, #zmf .outdent { position: relative; flex: 0 0 auto; }
     #zmf .b, #zmf .ib, #zmf .db { font-size: 14px; }
     #zmf .indent > .ib, #zmf .indent > .db, #zmf .outdent > .ib, #zmf .outdent > .db {
@@ -1278,6 +1344,7 @@
       #zmf .f { min-height: 114px; padding: 9px 7px; gap: 8px; }
       #zmf .mid { gap: 6px; }
       #zmf .mid .b { min-width: 66px; padding-left: 10px; padding-right: 10px; font-size: 13px; }
+      #zmf .mid .wrap-toggle { min-width: 106px; padding-left: 10px; padding-right: 9px; font-size: 12px; }
       #zmf .mid .clean-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
       #zmf .export-split > .b { min-width: 88px; }
       #zmf .indent > .ib, #zmf .outdent > .ib { padding: 0 17px !important; }
@@ -1288,7 +1355,7 @@
   <script>
     // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
     (function () {
-      var STANDALONE_VERSION = '2.0.1';
+      var STANDALONE_VERSION = '2.0.2';
       var panel = document.getElementById('zmf');
       if (!panel) return;
 
@@ -1316,6 +1383,43 @@
         if (navigator.virtualKeyboard && typeof navigator.virtualKeyboard.hide === 'function') {
           try { navigator.virtualKeyboard.hide(); } catch (ignore) {}
         }
+      }
+
+      // 视觉换行开关仅改变 textarea.wrap，不改写文本，也不会给导出、复制、统计或其它工具逻辑加入换行符。
+      var toolbar = panel.querySelector('.mid');
+      if (editor && toolbar) {
+        var wrapToggle = document.createElement('button');
+        wrapToggle.type = 'button';
+        wrapToggle.className = 'wrap-toggle';
+        wrapToggle.setAttribute('role', 'switch');
+
+        var wrapLabel = document.createElement('span');
+        wrapLabel.textContent = '换行显示';
+        var wrapTrack = document.createElement('span');
+        wrapTrack.className = 'wrap-toggle__track';
+        wrapTrack.setAttribute('aria-hidden', 'true');
+        var wrapThumb = document.createElement('span');
+        wrapThumb.className = 'wrap-toggle__thumb';
+        wrapTrack.appendChild(wrapThumb);
+        wrapToggle.appendChild(wrapLabel);
+        wrapToggle.appendChild(wrapTrack);
+        toolbar.appendChild(wrapToggle);
+
+        var wrapEnabled = false;
+        function setWrapDisplay(enabled) {
+          wrapEnabled = Boolean(enabled);
+          // soft 是浏览器的视觉自动换行：textarea.value 保持原样，导出时不会插入额外换行符。
+          editor.wrap = wrapEnabled ? 'soft' : 'off';
+          editor.setAttribute('wrap', wrapEnabled ? 'soft' : 'off');
+          wrapToggle.setAttribute('aria-checked', wrapEnabled ? 'true' : 'false');
+          wrapToggle.setAttribute('aria-label', '换行显示：' + (wrapEnabled ? '开启' : '关闭'));
+          wrapToggle.title = wrapEnabled ? '换行显示已开启' : '换行显示已关闭';
+        }
+        setWrapDisplay(false);
+        wrapToggle.addEventListener('pointerdown', suppressEditorKeyboard, true);
+        wrapToggle.addEventListener('click', function () {
+          setWrapDisplay(!wrapEnabled);
+        });
       }
 
       // “清理围栏”的箭头嵌在主按钮内。捕获阶段先锁定编辑器输入模式，避免触摸该箭头时重新请求软键盘。
@@ -1382,5 +1486,5 @@
       }, true);
     })();
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3943c12287018ae',t:'MTc4OTEwNDE0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
