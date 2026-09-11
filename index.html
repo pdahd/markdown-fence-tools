@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
-  <meta name="md-fence-tools-standalone-version" content="2.0.3">
-  <title>Markdown 围栏工作台 · v2.0.3</title>
+  <meta name="md-fence-tools-standalone-version" content="2.0.5">
+  <title>Markdown 围栏工作台 · v2.0.5</title>
   <style>
     :root {
       color-scheme: dark;
@@ -470,9 +470,22 @@
       A.value = newValue;
       // 不抢焦点，避免工具按钮唤起软键盘；主按钮的 pointerdown 会保留原 textarea 焦点和可见选区。
       A.setSelectionRange(Math.max(0, newStart), Math.max(0, newEnd));
-      // wrap=off 使逻辑行不再被折成“第二视觉行”；恢复原滚动视口，避免浏览器把文字自动拉回固定位置。
-      A.scrollTop = previousScrollTop;
-      A.scrollLeft = previousScrollLeft;
+      /*
+         不换行时可立刻恢复原滚动位置。自动换行时，移动 Chromium 会在 value/选区更新后的布局阶段
+         自动纵向滚动以追随光标；若同步恢复 scrollTop，会被那次延后的自动滚动覆盖，长按缩进后文字
+         就会视觉固定在第二行。此时延至下一帧恢复同一视口，逻辑行新增的前导空格便会自然占据后续
+         视觉行，文字将依次退到第二、第三、第四行……；文本内容和光标映射不受影响。
+      */
+      if (A.wrap === 'off') {
+        A.scrollTop = previousScrollTop;
+        A.scrollLeft = previousScrollLeft;
+      } else {
+        W.cancelAnimationFrame(A._zmfWrapScrollFrame);
+        A._zmfWrapScrollFrame = W.requestAnimationFrame(function () {
+          A.scrollTop = previousScrollTop;
+          A.scrollLeft = previousScrollLeft;
+        });
+      }
       count();
     }
 
@@ -1290,6 +1303,16 @@
       transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
     #zmf textarea::placeholder { color: #d2d2d2; opacity: 1; }
+    /*
+       soft wrap 下原生 textarea 会在视觉换行点吞掉/悬挂连续的行首空格，导致连续缩进的文本停在同一视觉行。
+       break-spaces 保留每个行首空格并允许它们占据新的视觉行；overflow-wrap:anywhere 同时保证长代码标识符也能折行。
+       该类只在“换行显示”开启时添加，textarea.value 不会被修改。
+    */
+    #zmf textarea.is-wrap-enabled {
+      white-space: break-spaces;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
     #zmf .c {
       order: 4;
       flex: 0 0 41px;
@@ -1359,7 +1382,7 @@
   <script>
     // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
     (function () {
-      var STANDALONE_VERSION = '2.0.3';
+      var STANDALONE_VERSION = '2.0.5';
       var panel = document.getElementById('zmf');
       if (!panel) return;
 
@@ -1415,6 +1438,7 @@
           // soft 是浏览器的视觉自动换行：textarea.value 保持原样，导出时不会插入额外换行符。
           editor.wrap = wrapEnabled ? 'soft' : 'off';
           editor.setAttribute('wrap', wrapEnabled ? 'soft' : 'off');
+          editor.classList.toggle('is-wrap-enabled', wrapEnabled);
           wrapToggle.setAttribute('aria-checked', wrapEnabled ? 'true' : 'false');
           wrapToggle.setAttribute('aria-label', '换行显示：' + (wrapEnabled ? '开启' : '关闭'));
           wrapToggle.title = wrapEnabled ? '换行显示已开启' : '换行显示已关闭';
