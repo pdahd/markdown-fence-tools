@@ -49,7 +49,6 @@
 <body>
   <noscript>此工具需要启用 JavaScript。</noscript>
   <script>
-    // 独立页嵌入与 panel.js 相同的运行时，直接打开 index.html 也不需要额外网络请求。
     window.__MDFenceToolsAutoOpen = true;
 /*
  * Markdown Fence Tools panel runtime
@@ -67,7 +66,6 @@
   var PANEL_ID = 'zmf';
   var LAUNCHER_ID = 'zmf-launch';
 
-  // 防止在同一页面意外重复注入。
   if (D.getElementById(LAUNCHER_ID)) return;
 
   var S = D.createElement('style');
@@ -191,11 +189,6 @@
     var P = D.createElement('div');
     P.id = PANEL_ID;
 
-    /*
-       YouTube 对扩展的 DOM HTML 解析 sink 启用了 Trusted Types。
-       因此这里特意只使用 createElement、textContent、setAttribute 和 appendChild，
-       不使用 innerHTML / insertAdjacentHTML / template.innerHTML 等会被 YouTube 拒绝的 API。
-    */
     function makeElement(tag, className, text) {
       var element = D.createElement(tag);
       if (className) element.className = className;
@@ -401,8 +394,6 @@
       });
     }
 
-    /* 有选区时返回相交的完整行；无选区时返回全文。
-       选区终点刚好跨过换行符时，不把下一行错误包含进来。 */
     function affectedLines(value, start, end) {
       if (start === end) return [0, value.length];
       var first = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
@@ -412,13 +403,10 @@
       return [first, nextBreak < 0 ? value.length : nextBreak];
     }
 
-    /* 每一行分别记录改动，再将原选区端点映射至新文本。
-       纯空行不追加空格；反缩进每行最多删除 step 个普通前导空格。 */
     function changeIndent(add, step) {
       var value = A.value;
       var originalStart = A.selectionStart;
       var originalEnd = A.selectionEnd;
-      // 赋回 textarea.value 会让移动浏览器重置/自动调整滚动位置；先记住视口，稍后恢复。
       var previousScrollTop = A.scrollTop;
       var previousScrollLeft = A.scrollLeft;
       var range = affectedLines(value, originalStart, originalEnd);
@@ -468,17 +456,19 @@
       var newStart = mapPosition(originalStart);
       var newEnd = mapPosition(originalEnd);
       A.value = newValue;
-      // 不抢焦点，避免工具按钮唤起软键盘；主按钮的 pointerdown 会保留原 textarea 焦点和可见选区。
       A.setSelectionRange(Math.max(0, newStart), Math.max(0, newEnd));
-      // 修复：开启视觉换行（soft wrap）时，保持视口在顶部，使连续缩进的后退与下移可见
+
+      // 修复：软换行模式下连续缩进时锁定视口顶部，使内容逐行后退下移可见
       if (A.getAttribute('wrap') === 'soft') {
-        A.scrollTop = 0;
-        A.scrollLeft = 0;
+        setTimeout(function () {
+          A.scrollTop = 0;
+          A.scrollLeft = 0;
+        }, 0);
       } else {
-        // wrap=off 使逻辑行不再被折成“第二视觉行”；恢复原滚动视口，避免浏览器把文字自动拉回固定位置。
         A.scrollTop = previousScrollTop;
         A.scrollLeft = previousScrollLeft;
       }
+
       count();
     }
 
@@ -498,7 +488,6 @@
     }
 
     function normalizeExtension(raw) {
-      // 去掉首部点号；允许常见的复合扩展名（例如 tar.gz），不允许路径符号或空白。
       return String(raw || '')
         .trim()
         .replace(/^\.+/, '')
@@ -530,7 +519,6 @@
       cleanMode = mode === 'wrap' ? 'wrap' : 'strip';
       var modeText = cleanMode === 'wrap' ? '清理围栏后为整体添加围栏' : '仅清理原有围栏';
       var buttonLabel = cleanMode === 'wrap' ? '清理+围栏' : '清理围栏';
-      // 菜单 ✓、主按钮文案、title 与 aria-label 都同步当前模式，避免用户关闭菜单后无法确认选择。
       cleanButton.dataset.normalLabel = buttonLabel;
       if (!cleanButton.classList.contains('is-feedback')) cleanLabelTarget.textContent = buttonLabel;
       cleanButton.title = modeText;
@@ -566,15 +554,9 @@
       }
     }
 
-    /*
-       textarea 保持焦点才能让原生选区继续可见；但 Android 会把普通文本输入焦点与软键盘绑定。
-       工具操作前将 inputmode 设为 none 且暂时设为 readonly：选区可见、脚本仍能改值，
-       但页面不再请求软键盘。用户亲自点回编辑区时会在默认聚焦动作前恢复可编辑状态。
-    */
     function setEditorKeyboardMode(allowTextInput) {
       A.setAttribute('inputmode', allowTextInput ? 'text' : 'none');
       A.readOnly = !allowTextInput;
-      // Chromium/Edge 如实现 VirtualKeyboard API，则同时关闭已经显示的软键盘；旧浏览器安全忽略。
       if (!allowTextInput && W.navigator.virtualKeyboard && typeof W.navigator.virtualKeyboard.hide === 'function') {
         try { W.navigator.virtualKeyboard.hide(); } catch (ignore) {}
       }
@@ -588,7 +570,6 @@
     A.addEventListener('input', count);
 
     function flashButton(button, message, duration) {
-      // 清理按钮内部带有下拉箭头；只替换其标签 span，不能用 button.textContent 覆盖并删除箭头。
       var labelTarget = button.querySelector('[data-feedback-label]') || button;
       var normal = button.dataset.normalLabel || labelTarget.textContent;
       button.dataset.normalLabel = normal;
@@ -601,8 +582,6 @@
       }, duration || 1300);
     }
 
-    /* 中央按钮也在 pointerdown 立即执行，避免移动端等待松手后的 click 才有反应。
-       同时阻止其夺走 textarea 焦点，确保选区、软键盘抑制策略与缩进按钮完全一致。 */
     function installInstantAction(button, action) {
       var suppressClickUntil = 0;
       function runAction() {
@@ -626,11 +605,6 @@
       });
     }
 
-    /*
-       先前通过 click 执行：触屏浏览器通常要等手指抬起才派发 click，视觉上会显得滞后。
-       这里改在 pointerdown 立即执行，并在按住 360ms 后每 85ms 连续执行。
-       阻止按钮取得焦点，textarea 仍保有焦点/可见选区，因此既不丢选区，也不会由脚本重新唤起软键盘。
-    */
     function installRepeatAction(button, add) {
       var isDown = false;
       var holdTimer = 0;
@@ -638,7 +612,6 @@
       var suppressClickUntil = 0;
 
       function runOnce() {
-        // 只在工具动作期间关闭虚拟键盘请求；不改变 textarea 的焦点或已建立选区。
         setEditorKeyboardMode(false);
         closeMenus();
         changeIndent(add, add ? inStep : outStep);
@@ -648,14 +621,12 @@
         isDown = false;
         W.clearTimeout(holdTimer);
         W.clearInterval(repeatTimer);
-        // 同一次触摸/鼠标操作后仍可能补发 click；忽略它，避免多执行一次。
         suppressClickUntil = Date.now() + 750;
         if (event && button.releasePointerCapture && button.hasPointerCapture && button.hasPointerCapture(event.pointerId)) {
           button.releasePointerCapture(event.pointerId);
         }
       }
 
-      // Android 的长按文字选择/系统菜单会触发 pointercancel，从而中止定时器；明确禁用这些按钮上的原生文字手势。
       ['selectstart', 'dragstart', 'contextmenu'].forEach(function (eventName) {
         button.addEventListener(eventName, function (event) { event.preventDefault(); });
       });
@@ -665,19 +636,17 @@
         event.preventDefault();
         isDown = true;
         if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
-        runOnce(); // 按下即响应，而不是等 click / 松手。
+        runOnce();
         holdTimer = W.setTimeout(function () {
           if (!isDown) return;
           repeatTimer = W.setInterval(runOnce, 85);
         }, 360);
       });
-      // 某些桌面 Chromium 会在 pointerdown 后补发 mousedown；再次阻止其默认聚焦行为。
       button.addEventListener('mousedown', function (event) { event.preventDefault(); });
       button.addEventListener('pointerup', stopRepeating);
       button.addEventListener('pointercancel', stopRepeating);
       button.addEventListener('lostpointercapture', stopRepeating);
       button.addEventListener('click', function (event) {
-        // pointer 操作已经在 pointerdown 完成；保留此分支供键盘 Enter/Space 访问。
         if (event.detail !== 0 && Date.now() < suppressClickUntil) {
           event.preventDefault();
           return;
@@ -697,7 +666,6 @@
     exportDropButton.onclick = function (event) {
       toggleMenu('ext', event);
     };
-    // 这个箭头嵌在“清理围栏”主按钮内，须阻止事件冒泡，避免点箭头同时执行清理。
     cleanDropButton.addEventListener('pointerdown', function (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -829,11 +797,6 @@
         flashButton(plainTextButton, '无内容');
         return;
       }
-
-      /*
-         基于提供书签的转换顺序：先保护不应继续解析的片段，再依次去掉 Markdown 标记。
-         表格原样保留，代码块/行内代码只去围栏或反引号，内部字符不再被粗体、链接等规则误改。
-      */
       var stored = [];
       function store(value) {
         var index = stored.length;
@@ -841,34 +804,30 @@
         return '\u0000ZMF' + index + '\u0000';
       }
       var value = A.value.replace(/\r\n?/g, '\n');
-
-      // 先取出三反引号和波浪线代码块，并只移除其最外层围栏和语言声明。
       value = value.replace(/^[ \t]*(`{3,}|~{3,})[^\n]*\n([\s\S]*?)^[ \t]*\1[ \t]*$/gm, function (match, fence, code) {
         return store(code.replace(/\n$/, ''));
       });
-      // 沿用参考书签的原则：含竖线的连续表格行原样保留，避免表格结构被链接/强调规则打散。
       value = value.replace(/(?:^[^\n]*\|[^\n]*(?:\n|$))+/gm, function (table) {
         return store(table.replace(/\n$/, '')) + '\n';
       });
-      // 行内代码原样保留内容，仅移除单反引号。
       value = value.replace(/`([^`\n]+)`/g, function (match, code) {
         return store(code);
       });
 
       value = value
-        .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')       // 图片保留替代文本
-        .replace(/\[([^\]\n]+)\]\((?:\\.|[^)\n])*\)/g, '$1') // 行内链接保留标题
-        .replace(/\[([^\]\n]+)\]\[[^\]\n]*\]/g, '$1')         // 引用式链接保留标题
-        .replace(/^\s*\[[^\]\n]+\]:\s*\S+.*$/gm, '')            // 移除引用式链接的地址定义
-        .replace(/(\*\*|__)([\s\S]*?)\1/g, '$2')                // 粗体
-        .replace(/(\*|_)([^*_\n]+)\1/g, '$2')                    // 斜体
-        .replace(/~~([\s\S]*?)~~/g, '$1')                         // 删除线
-        .replace(/^#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, '$1')    // ATX 标题
-        .replace(/^[ \t]*(?:=+|-+)[ \t]*$/gm, '')                 // Setext 标题下划线 / 分隔线
-        .replace(/^[ \t]*>[ \t]?/gm, '')                          // 引用块符号
-        .replace(/^([ \t]*)[-*+][ \t]+(?:\[[ xX]\][ \t]*)?/gm, '$1• ') // 无序/任务列表
-        .replace(/<[^>\n]+>/g, '')                                 // 内嵌 HTML 标签
-        .replace(/\\([\\`*_[\]{}()#+\-.!>~|])/g, '$1')            // Markdown 转义字符
+        .replace(/!\[([^\]]*)\]\((?:\\.|[^)])*\)/g, '$1')
+        .replace(/\[([^\]\n]+)\]\((?:\\.|[^)\n])*\)/g, '$1')
+        .replace(/\[([^\]\n]+)\]\[[^\]\n]*\]/g, '$1')
+        .replace(/^\s*\[[^\]\n]+\]:\s*\S+.*$/gm, '')
+        .replace(/(\*\*|__)([\s\S]*?)\1/g, '$2')
+        .replace(/(\*|_)([^*_\n]+)\1/g, '$2')
+        .replace(/~~([\s\S]*?)~~/g, '$1')
+        .replace(/^#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$/gm, '$1')
+        .replace(/^[ \t]*(?:=+|-+)[ \t]*$/gm, '')
+        .replace(/^[ \t]*>[ \t]?/gm, '')
+        .replace(/^([ \t]*)[-*+][ \t]+(?:\[[ xX]\][ \t]*)?/gm, '$1• ')
+        .replace(/<[^>\n]+>/g, '')
+        .replace(/\\([\\`*_[\]{}()#+\-.!>~|])/g, '$1')
         .replace(/\n{3,}/g, '\n\n')
         .trim();
 
@@ -881,8 +840,6 @@
     }
 
     function trimOuterBlankLines(value) {
-      // 只移除首尾“空行”（可含普通空格或 Tab），不会破坏第一/最后一行正文原有的缩进。
-      // 不能用 value.trim()，否则第一/最后一行代码本身的前导/尾随空格也会被错误删除。
       var lines = value.split('\n');
       while (lines.length && /^[ \t]*$/.test(lines[0])) lines.shift();
       while (lines.length && /^[ \t]*$/.test(lines[lines.length - 1])) lines.pop();
@@ -900,7 +857,6 @@
         .replace(/^[ \t]*```[ \t]*$/gm, '');
 
       if (cleanMode === 'wrap') {
-        // 包裹前只清除整体内容最外层的空行，保证开/闭围栏与正文紧贴；正文内部空行完全保留。
         var content = trimOuterBlankLines(cleaned);
         if (content === '') {
           A.value = '';
@@ -908,7 +864,6 @@
           flashButton(cleanButton, '无内容');
           return;
         }
-        // 开围栏不附带语言声明；content 的首尾已没有空行，故两侧均不会出现多余空白行。
         A.value = '```\n' + content + '\n```';
         count();
         flashButton(cleanButton, '已加围栏');
@@ -920,7 +875,6 @@
     }
 
     function legacyCopy() {
-      // Clipboard API 不可用时才走此兼容路径；恢复原选区，避免复制操作改变用户当前选择。
       var start = A.selectionStart;
       var end = A.selectionEnd;
       A.select();
@@ -955,18 +909,16 @@
       importSheet.setAttribute('aria-hidden', 'true');
     }
     function requestImportFile() {
-      // 该调用由 Bottom Sheet 内“从设备选择文件”的真实 click 直接触发，满足移动浏览器的用户手势要求。
       I.click();
     }
     chooseFileButton.onclick = requestImportFile;
     closeImportSheetButton.onclick = closeImportSheet;
     importSheet.onclick = function (event) {
-      // 只点到半透明遮罩时关闭；点 Sheet 本身不会误关。
       if (event.target === importSheet) closeImportSheet();
     };
     I.onchange = function () {
       var file = I.files[0];
-      if (!file) return; // 用户从系统文件选择器取消时，仍保留 Bottom Sheet。
+      if (!file) return;
       closeImportSheet();
       var reader = new FileReader();
       reader.onload = function () {
@@ -987,7 +939,6 @@
       var now = new Date();
       var milliseconds = String(now.getMilliseconds());
       while (milliseconds.length < 3) milliseconds = '0' + milliseconds;
-      // 使用设备本地系统时间，避免冒号等不适合作为文件名的字符，并以毫秒避免连续导出重名。
       return now.getFullYear() + twoDigits(now.getMonth() + 1) + twoDigits(now.getDate()) + '_' +
         twoDigits(now.getHours()) + twoDigits(now.getMinutes()) + twoDigits(now.getSeconds()) + '_' + milliseconds;
     }
@@ -1021,7 +972,6 @@
     installInstantAction(plainTextButton, convertMarkdownToPlainText);
 
     count();
-    // 打开面板时同样不抢占 textarea 焦点，避免 Android 自动弹出键盘。
   }
 
   function toggleTool() {
@@ -1037,7 +987,6 @@
     }
   });
 
-  // Public API for the GitHub Pages standalone page and the tiny remote-bookmark loader.
   W.MDFenceTools = {
     version: '1.9.1',
     open: openTool,
@@ -1085,7 +1034,6 @@
       font-size: clamp(20px, 2vw, 27px);
       font-weight: 760;
       letter-spacing: -.035em;
-      text-shadow: 0 1px 2px rgba(0,0,0,.45);
       cursor: default;
       touch-action: auto;
     }
@@ -1107,7 +1055,6 @@
     }
     #zmf .x { display: none !important; }
 
-    /* 顶部工具条：Premiere 式中灰面板，明确 1px 亮边 + 顶部高光 + 底部压暗 + 外圈深色描边。 */
     #zmf .f {
       order: 2;
       flex: 0 0 auto;
@@ -1134,7 +1081,6 @@
       gap: 9px;
     }
 
-    /* 仅控制编辑器的视觉换行；默认关闭，切换时不会改写 textarea 的任何文本。 */
     #zmf .wrap-toggle {
       display: inline-flex;
       align-items: center;
@@ -1157,7 +1103,6 @@
       -webkit-tap-highlight-color: transparent;
       transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, filter .16s ease;
     }
-    /* 位于工作台标题同一水平线的右端，不另建一行，也不占用工具栏的按钮位置。 */
     #zmf .h > .wrap-toggle { margin-left: auto; flex: 0 0 auto; }
     #zmf .wrap-toggle:hover { filter: brightness(1.12); }
     #zmf .wrap-toggle:active { transform: translateY(1px); }
@@ -1201,6 +1146,7 @@
       background: #ffffff;
       transform: translateX(14px);
     }
+
     #zmf .indent, #zmf .outdent { position: relative; flex: 0 0 auto; }
     #zmf .b, #zmf .ib, #zmf .db { font-size: 14px; }
     #zmf .indent > .ib, #zmf .indent > .db, #zmf .outdent > .ib, #zmf .outdent > .db {
@@ -1215,7 +1161,6 @@
     #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
     #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
 
-    /* 缩进 / 反缩进按住反馈色保持朋友原值，不改动。 */
     #zmf .indent > .ib.is-pressed {
       background: #1d4ed8 !important;
       color: #fff !important;
@@ -1228,15 +1173,11 @@
       box-shadow: inset 0 2px 8px rgba(69, 10, 10, .48), 0 0 0 2px rgba(252, 113, 113, .26) !important;
       filter: saturate(1.16) brightness(.94);
     }
-    /* 触屏设备抬起手指后 :hover 会一直残留，而共享样式里的 hover 色与按住色相同，
-       导致 .is-pressed 已移除仍显示深色。此处仅在不支持真实悬停的设备上，
-       让未按下状态的 hover 回到原色；桌面鼠标的悬停效果不受影响。 */
     @media (hover: none) {
       #zmf .indent > .ib:hover:not(.is-pressed) { background: #2563eb !important; }
       #zmf .outdent > .ib:hover:not(.is-pressed) { background: #dc2626 !important; }
     }
 
-    /* 下拉菜单：灰色浮层，1px 亮边 + 深色外描边，与工具条拉开层次。 */
     #zmf .menu {
       top: calc(100% + 8px);
       bottom: auto;
@@ -1268,8 +1209,6 @@
       box-shadow: inset 0 1px 2px rgba(0,0,0,.35), 0 0 0 2px rgba(255,255,255,.10);
     }
 
-    /* 文本编辑区：单独的中灰色内部（明显浅于界面其它区块），
-       加粗 2px 亮灰边框 + 外圈深色压边 + 内凹阴影，保证输入框显眼、边缘一眼可辨。 */
     #zmf textarea {
       order: 3;
       flex: 1 1 auto;
@@ -1312,7 +1251,6 @@
     }
     #zmf .c b { color: #f2f2f2; font-weight: 700; }
 
-    /* 导入底部面板：灰色容器 + 明确顶边；内部两个按钮沿用共享运行时配色，未做改动。 */
     #zmf .sheet-backdrop { position: fixed; background: rgba(0,0,0,.5); }
     #zmf .import-sheet {
       background: linear-gradient(180deg, #3c3c3c, #303030);
@@ -1337,7 +1275,6 @@
         padding: 10px;
         flex-wrap: wrap;
         justify-content: center;
-        /* 不裁切下拉菜单；窄屏时工具区自然换行。 */
         overflow: visible;
       }
       #zmf .mid { order: 1; flex: 1 0 100%; flex-wrap: wrap; }
@@ -1348,7 +1285,6 @@
     @media (max-width: 560px) {
       #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 20px); }
       #zmf .h { gap: 8px; font-size: 19px; }
-      /* 手机窄屏仍保持标题和换行开关同一行；标题内含版本号，故隐藏重复的独立版徽标来给开关让位。 */
       #zmf .h > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
       #zmf .h .site-kicker { display: none; }
       #zmf .f { min-height: 114px; padding: 9px 7px; gap: 8px; }
@@ -1363,7 +1299,6 @@
     }
   </style>
   <script>
-    // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
     (function () {
       var STANDALONE_VERSION = '2.0.3';
       var panel = document.getElementById('zmf');
@@ -1377,7 +1312,6 @@
         badge.className = 'site-kicker';
         badge.textContent = '独立版 v' + STANDALONE_VERSION;
         header.appendChild(badge);
-        // 全页工作台不应被误拖动或双击折叠。
         header.addEventListener('pointerdown', function (event) {
           if (!event.target.closest('.x')) event.stopImmediatePropagation();
         }, true);
@@ -1386,7 +1320,6 @@
 
       var editor = panel.querySelector('textarea');
       function suppressEditorKeyboard() {
-        // 共享面板的工具按钮也采用该策略；这里让嵌在清理按钮中的箭头同样立即收起软键盘。
         if (!editor) return;
         editor.setAttribute('inputmode', 'none');
         editor.readOnly = true;
@@ -1395,8 +1328,6 @@
         }
       }
 
-      // 视觉换行开关仅改变 textarea.wrap，不改写文本，也不会给导出、复制、统计或其它工具逻辑加入换行符。
-      // 放到标题栏右端，和左侧工作台标题保持同一行；工具栏按钮区不再包含此开关。
       if (editor && header) {
         var wrapToggle = document.createElement('button');
         wrapToggle.type = 'button';
@@ -1418,7 +1349,6 @@
         var wrapEnabled = false;
         function setWrapDisplay(enabled) {
           wrapEnabled = Boolean(enabled);
-          // soft 是浏览器的视觉自动换行：textarea.value 保持原样，导出时不会插入额外换行符。
           editor.wrap = wrapEnabled ? 'soft' : 'off';
           editor.setAttribute('wrap', wrapEnabled ? 'soft' : 'off');
           wrapToggle.setAttribute('aria-checked', wrapEnabled ? 'true' : 'false');
@@ -1432,7 +1362,6 @@
         });
       }
 
-      // “清理围栏”的箭头嵌在主按钮内。捕获阶段先锁定编辑器输入模式，避免触摸该箭头时重新请求软键盘。
       var cleanArrow = panel.querySelector('.clean-arrow');
       if (cleanArrow) {
         ['pointerdown', 'mousedown', 'click'].forEach(function (eventName) {
@@ -1440,8 +1369,6 @@
         });
       }
 
-      // 导入面板在 pointerdown 立即打开。部分移动浏览器会把同一次手势随后产生的 click 重新命中遮罩，
-      // 导致它刚显示就被“点遮罩关闭”；仅忽略这一个短暂的后续遮罩 click，真正的后续点击仍照常关闭。
       var importButton = panel.querySelector('[data-k="im"]');
       var importSheet = panel.querySelector('[data-import-sheet]');
       var ignoreBackdropClickUntil = 0;
@@ -1449,7 +1376,6 @@
         importButton.addEventListener('pointerdown', function (event) {
           if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
           ignoreBackdropClickUntil = Date.now() + 850;
-          // 与共享运行时的 openImportSheet() 做相同状态更新，确保本页遮罩立即、稳定地呈现。
           importSheet.classList.add('show');
           importSheet.setAttribute('aria-hidden', 'false');
         }, true);
@@ -1461,7 +1387,6 @@
         }, true);
       }
 
-      // 缩进/反缩进共用已有的立即执行及长按逻辑；这里只补上严格随按下/松开同步的视觉状态。
       function installPressedFeedback(button) {
         if (!button) return;
         var activePointerId = null;
@@ -1487,7 +1412,6 @@
       installPressedFeedback(panel.querySelector('.indent > .ib'));
       installPressedFeedback(panel.querySelector('.outdent > .ib'));
 
-      // 独立页没有浮动启动器，故禁用原面板的 Ctrl+Alt+M 开关，避免整个工作台被意外关闭。
       document.addEventListener('keydown', function (event) {
         if (event.ctrlKey && event.altKey && String(event.key).toLowerCase() === 'm') {
           event.preventDefault();
