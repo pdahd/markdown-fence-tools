@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
-  <meta name="md-fence-tools-standalone-version" content="2.0.2">
-  <title>Markdown 围栏工作台 · v2.0.2</title>
+  <meta name="md-fence-tools-standalone-version" content="2.0.3">
+  <title>Markdown 围栏工作台 · v2.0.3</title>
   <style>
     :root {
       color-scheme: dark;
@@ -1151,6 +1151,8 @@
       -webkit-tap-highlight-color: transparent;
       transition: border-color .16s ease, background .16s ease, box-shadow .16s ease, filter .16s ease;
     }
+    /* 位于工作台标题同一水平线的右端，不另建一行，也不占用工具栏的按钮位置。 */
+    #zmf .h > .wrap-toggle { margin-left: auto; flex: 0 0 auto; }
     #zmf .wrap-toggle:hover { filter: brightness(1.12); }
     #zmf .wrap-toggle:active { transform: translateY(1px); }
     #zmf .wrap-toggle:focus-visible {
@@ -1340,7 +1342,9 @@
     @media (max-width: 560px) {
       #zmf .h, #zmf .f, #zmf textarea, #zmf .c { width: calc(100% - 20px); }
       #zmf .h { gap: 8px; font-size: 19px; }
-      #zmf .site-kicker { padding: 0 7px; font-size: 10px; }
+      /* 手机窄屏仍保持标题和换行开关同一行；标题内含版本号，故隐藏重复的独立版徽标来给开关让位。 */
+      #zmf .h > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+      #zmf .h .site-kicker { display: none; }
       #zmf .f { min-height: 114px; padding: 9px 7px; gap: 8px; }
       #zmf .mid { gap: 6px; }
       #zmf .mid .b { min-width: 66px; padding-left: 10px; padding-right: 10px; font-size: 13px; }
@@ -1355,7 +1359,7 @@
   <script>
     // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
     (function () {
-      var STANDALONE_VERSION = '2.0.2';
+      var STANDALONE_VERSION = '2.0.3';
       var panel = document.getElementById('zmf');
       if (!panel) return;
 
@@ -1386,8 +1390,8 @@
       }
 
       // 视觉换行开关仅改变 textarea.wrap，不改写文本，也不会给导出、复制、统计或其它工具逻辑加入换行符。
-      var toolbar = panel.querySelector('.mid');
-      if (editor && toolbar) {
+      // 放到标题栏右端，和左侧工作台标题保持同一行；工具栏按钮区不再包含此开关。
+      if (editor && header) {
         var wrapToggle = document.createElement('button');
         wrapToggle.type = 'button';
         wrapToggle.className = 'wrap-toggle';
@@ -1403,7 +1407,7 @@
         wrapTrack.appendChild(wrapThumb);
         wrapToggle.appendChild(wrapLabel);
         wrapToggle.appendChild(wrapTrack);
-        toolbar.appendChild(wrapToggle);
+        header.appendChild(wrapToggle);
 
         var wrapEnabled = false;
         function setWrapDisplay(enabled) {
@@ -1486,5 +1490,5 @@
       }, true);
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3943c12287018ae',t:'MTc4OTEwNDE0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
