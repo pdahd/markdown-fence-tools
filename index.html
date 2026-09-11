@@ -470,7 +470,7 @@
       A.value = newValue;
       // 不抢焦点，避免工具按钮唤起软键盘；主按钮的 pointerdown 会保留原 textarea 焦点和可见选区。
       A.setSelectionRange(Math.max(0, newStart), Math.max(0, newEnd));
-      // 恢复原滚动视口，避免浏览器把文字自动拉回固定位置。
+      // wrap=off 使逻辑行不再被折成“第二视觉行”；恢复原滚动视口，避免浏览器把文字自动拉回固定位置。
       A.scrollTop = previousScrollTop;
       A.scrollLeft = previousScrollLeft;
       count();
@@ -1289,6 +1289,19 @@
       text-shadow: 0 1px 1px rgba(0,0,0,.18);
       transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
     }
+    /* 换行显示开启（wrap="soft"）时：
+       1. break-spaces 确保连续缩进空格不挂起（hung），超出第一行时真正折行生成空白，从而把文本持续推到第3行、第4行…
+       2. break-all 与 anywhere 确保长文本本身可在任意字符处断行。
+       关闭换行（wrap="off"）时由 pre 接管，恢复横向滚动。 */
+    #zmf textarea[wrap="soft"] {
+      white-space: break-spaces !important;
+      word-break: break-all !important;
+      overflow-wrap: anywhere !important;
+    }
+    #zmf textarea[wrap="off"] {
+      white-space: pre !important;
+      word-break: normal !important;
+    }
     #zmf textarea::placeholder { color: #d2d2d2; opacity: 1; }
     #zmf .c {
       order: 4;
@@ -1389,7 +1402,7 @@
         }
       }
 
-      // 视觉换行开关仅改变 textarea 视觉排版，不改写文本，也不会给导出、复制、统计或其它工具逻辑加入换行符。
+      // 视觉换行开关仅改变 textarea.wrap，不改写文本，也不会给导出、复制、统计或其它工具逻辑加入换行符。
       // 放到标题栏右端，和左侧工作台标题保持同一行；工具栏按钮区不再包含此开关。
       if (editor && header) {
         var wrapToggle = document.createElement('button');
@@ -1412,12 +1425,9 @@
         var wrapEnabled = false;
         function setWrapDisplay(enabled) {
           wrapEnabled = Boolean(enabled);
-          // soft 是浏览器的视觉自动换行；使用 break-spaces 确保连续前导空格在行尾真实折行占位，
-          // 避免 pre-wrap 挂起（hang）导致文本在缩进时固定在第二行无法继续下移。
+          // soft 是浏览器的视觉自动换行：textarea.value 保持原样，导出时不会插入额外换行符。
           editor.wrap = wrapEnabled ? 'soft' : 'off';
           editor.setAttribute('wrap', wrapEnabled ? 'soft' : 'off');
-          editor.style.whiteSpace = wrapEnabled ? 'break-spaces' : 'pre';
-          editor.style.wordBreak = wrapEnabled ? 'break-word' : 'normal';
           wrapToggle.setAttribute('aria-checked', wrapEnabled ? 'true' : 'false');
           wrapToggle.setAttribute('aria-label', '换行显示：' + (wrapEnabled ? '开启' : '关闭'));
           wrapToggle.title = wrapEnabled ? '换行显示已开启' : '换行显示已关闭';
