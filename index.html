@@ -7,6 +7,13 @@
   <meta name="description" content="Markdown 代码围栏工具：独立的全页编辑工作台">
   <meta name="md-fence-tools-standalone-version" content="2.0.3">
   <title>Markdown 围栏工作台 · v2.0.3</title>
+  <style type="text/tailwindcss">
+    /* Omit Preflight to preserve the supplied styles. */
+    @layer theme, utilities;
+    @import "tailwindcss/theme.css" layer(theme);
+    @import "tailwindcss/utilities.css" layer(utilities);
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -86,8 +93,6 @@
 #zmf .b,#zmf .ib,#zmf .db{border:0;font-size:13px;font-weight:600;cursor:pointer;color:#e6e9f0}
 #zmf .b{border-radius:999px;padding:8px 16px;background:#3a4055}
 #zmf .b:hover,#zmf .ib:hover,#zmf .db:hover{background:#4b5563}
-#zmf .go{background:#0e7490;color:#fff}
-#zmf .go:hover{background:#155e75}
 /* 页面自身的 button 规则可能带 margin/min-height，故直接子按钮在此完整重置，确保两半严丝合缝。 */
 #zmf .indent,#zmf .outdent{display:flex!important;align-items:stretch!important;gap:0!important;column-gap:0!important;row-gap:0!important;white-space:nowrap}
 #zmf .indent>.ib,#zmf .indent>.db,#zmf .outdent>.ib,#zmf .outdent>.db{display:flex!important;align-items:center!important;justify-content:center!important;align-self:stretch!important;box-sizing:border-box!important;width:auto;min-width:0!important;height:34px!important;min-height:34px!important;max-height:34px!important;margin:0!important;border:0!important;outline:0!important;line-height:1!important}
@@ -101,12 +106,12 @@
 #zmf .mid .b[data-k="cl"]{background:#dc2626!important}
 #zmf .mid .b[data-k="im"]{background:#7c3aed!important}
 #zmf .mid .b[data-k="ex"]{background:#059669!important}
-#zmf .mid .b[data-k="pa"]{min-width:100px;background:#d97706!important}
+#zmf .mid .b[data-k="pa"]{background:#d97706!important}
 #zmf .mid .b:hover{filter:brightness(1.14)}
 #zmf .mid .b:active{transform:translateY(1px) scale(.98);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 2px 4px rgba(0,0,0,.2)}
 #zmf .mid .b.is-feedback{filter:brightness(1.22) saturate(1.15);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 0 0 1px rgba(255,255,255,.38)}
-/* 转纯文本位于主工具栏；外框宽度与粘贴主按钮相同。 */
-#zmf .mid .paste-main,#zmf .mid .text-convert{width:112px;min-width:112px!important}
+/* 转纯文本位于主工具栏，保留原有宽度。 */
+#zmf .mid .text-convert{width:112px;min-width:112px!important}
 #zmf .mid .text-convert{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:9px;padding:8px 12px;background:#0284c7!important;color:#fff!important;box-shadow:0 2px 0 rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.16);text-shadow:0 1px 1px rgba(0,0,0,.22);transition:transform .1s ease,filter .1s ease,box-shadow .1s ease;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #zmf .mid .text-convert:hover{background:#0369a1!important;filter:brightness(1.12)}
 #zmf .mid .text-convert:active{transform:translateY(1px) scale(.98);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 2px 4px rgba(0,0,0,.2)}
@@ -297,7 +302,7 @@
     add(exportSplit, extensionMenu);
     add(middle, exportSplit);
 
-    add(middle, makeButton('b paste-main', 'pa', '粘贴'));
+    add(middle, makeButton('b', 'pa', '粘贴'));
     add(middle, makeButton('b text-convert', 'pt', '转纯文本'));
     add(footer, middle);
 
@@ -356,6 +361,7 @@
     var inStep = 2;
     var outStep = 2;
     var exportExtension = 'txt';
+    var pastePending = false;
 
     function count() {
       C.textContent = A.value.length.toLocaleString();
@@ -535,7 +541,6 @@
     A.addEventListener('input', count);
 
     function flashButton(button, message, duration) {
-      // 按钮内部可能带有标签 span；优先替换标签而非 button.textContent，兼容带子元素的按钮。
       var labelTarget = button.querySelector('[data-feedback-label]') || button;
       var normal = button.dataset.normalLabel || labelTarget.textContent;
       button.dataset.normalLabel = normal;
@@ -800,29 +805,47 @@
       flashButton(plainTextButton, '已转纯文本');
     }
 
-    function pasteText() {
-      // 读取系统剪贴板并插入当前光标处；有选区则替换选区。读取需要浏览器授予剪贴板权限。
+    async function pasteText() {
+      if (pastePending) return;
       if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
-        flashButton(pasteButton, '无法读取');
+        flashButton(pasteButton, '不支持');
+        pasteButton.title = '当前环境无法读取剪贴板，请长按编辑区使用系统粘贴。';
         return;
       }
-      flashButton(pasteButton, '粘贴中');
-      navigator.clipboard.readText().then(function (text) {
-        if (!text) {
-          flashButton(pasteButton, '剪贴板为空');
+
+      var value = A.value;
+      var start = A.selectionStart;
+      var end = A.selectionEnd;
+      var previousScrollTop = A.scrollTop;
+      var previousScrollLeft = A.scrollLeft;
+      pastePending = true;
+      flashButton(pasteButton, '读取中');
+      try {
+        var text = await navigator.clipboard.readText();
+        if (!P.isConnected) return;
+        if (text === '') {
+          flashButton(pasteButton, '无文本');
           return;
         }
-        var value = A.value;
-        var start = Math.max(0, Math.min(A.selectionStart, value.length));
-        var end = Math.max(start, Math.min(A.selectionEnd, value.length));
-        A.value = value.slice(0, start) + text + value.slice(end);
-        var caret = start + text.length;
-        A.setSelectionRange(caret, caret);
+        // 权限弹窗期间正文若已改变，不使用旧选区覆盖新内容。
+        if (A.value !== value) {
+          flashButton(pasteButton, '请重试');
+          return;
+        }
+        A.setRangeText(text, start, end, 'end');
+        A.scrollTop = previousScrollTop;
+        A.scrollLeft = previousScrollLeft;
         count();
+        pasteButton.title = '读取剪贴板，替换选区或插入光标位置。';
         flashButton(pasteButton, '已粘贴');
-      }).catch(function () {
-        flashButton(pasteButton, '粘贴失败');
-      });
+      } catch (error) {
+        if (P.isConnected) {
+          pasteButton.title = '剪贴板读取失败，请允许剪贴板权限，或长按编辑区使用系统粘贴。';
+          flashButton(pasteButton, '粘贴失败');
+        }
+      } finally {
+        pastePending = false;
+      }
     }
 
     function legacyCopy() {
@@ -923,7 +946,20 @@
     installInstantAction(clearButton, clearText);
     installInstantAction(importButton, openImportSheet);
     installInstantAction(exportButton, exportText);
-    installInstantAction(pasteButton, pasteText);
+    // 粘贴使用真实 click 读取剪贴板，兼容触屏浏览器的用户激活要求。
+    pasteButton.title = '读取剪贴板，替换选区或插入光标位置。';
+    pasteButton.addEventListener('pointerdown', function (event) {
+      if (event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+      event.preventDefault();
+      setEditorKeyboardMode(false);
+      closeMenus();
+    });
+    pasteButton.addEventListener('mousedown', function (event) { event.preventDefault(); });
+    pasteButton.addEventListener('click', function () {
+      setEditorKeyboardMode(false);
+      closeMenus();
+      pasteText();
+    });
     installInstantAction(plainTextButton, convertMarkdownToPlainText);
 
     count();
@@ -960,7 +996,7 @@
   <style id="standalone-workspace-theme">
     /* 只影响独立网页：远程书签加载的 panel.js 不会得到本主题。
        Premiere Pro 风格灰色主题：仅重设区块底色 / 边框 / 阴影 / 文字色，
-       8 个主按钮 + 4 个下拉三角配色与按下反馈一律保持共享运行时原样。 */
+       8 个主按钮 + 3 个下拉三角配色与按下反馈一律保持共享运行时原样。 */
     #zmf-launch { display: none !important; }
     #zmf {
       position: fixed !important;
@@ -1270,12 +1306,14 @@
       #zmf .mid { gap: 6px; }
       #zmf .mid .b { min-width: 66px; padding-left: 10px; padding-right: 10px; font-size: 13px; }
       #zmf .mid .wrap-toggle { min-width: 106px; padding-left: 10px; padding-right: 9px; font-size: 12px; }
-      #zmf .mid .paste-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
+      #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
       #zmf .export-split > .b { min-width: 88px; }
       #zmf .indent > .ib, #zmf .outdent > .ib { padding: 0 17px !important; }
       #zmf textarea { padding: 16px; font-size: 13px; line-height: 1.65; }
       #zmf .c { flex-basis: 34px; padding-top: 8px; }
     }
+    /* 固定高度内增加顶部内边距，使两枚主按钮文字下移 1px；不移动按钮或箭头。 */
+    #zmf .indent > .ib, #zmf .outdent > .ib { padding-top: 2px !important; }
   </style>
   <script>
     // 独立页特有的小增强；不改写共享运行时，因此远程书签的面板行为与外观不受影响。
@@ -1301,7 +1339,6 @@
 
       var editor = panel.querySelector('textarea');
       function suppressEditorKeyboard() {
-        // 共享面板的工具按钮也采用该策略；这里让标题栏内的其它控件同样立即收起软键盘。
         if (!editor) return;
         editor.setAttribute('inputmode', 'none');
         editor.readOnly = true;
