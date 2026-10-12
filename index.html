@@ -101,12 +101,12 @@
 #zmf .mid .b[data-k="cl"]{background:#dc2626!important}
 #zmf .mid .b[data-k="im"]{background:#7c3aed!important}
 #zmf .mid .b[data-k="ex"]{background:#059669!important}
-#zmf .mid .b[data-k="cf"]{min-width:100px;background:#d97706!important}
+#zmf .mid .b[data-k="pa"]{min-width:100px;background:#d97706!important}
 #zmf .mid .b:hover{filter:brightness(1.14)}
 #zmf .mid .b:active{transform:translateY(1px) scale(.98);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 2px 4px rgba(0,0,0,.2)}
 #zmf .mid .b.is-feedback{filter:brightness(1.22) saturate(1.15);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 0 0 1px rgba(255,255,255,.38)}
-/* 转纯文本位于主工具栏；外框宽度与清理围栏主按钮相同，不占用其下拉箭头区域。 */
-#zmf .mid .clean-main,#zmf .mid .text-convert{width:112px;min-width:112px!important}
+/* 转纯文本位于主工具栏；外框宽度与粘贴主按钮相同。 */
+#zmf .mid .paste-main,#zmf .mid .text-convert{width:112px;min-width:112px!important}
 #zmf .mid .text-convert{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:9px;padding:8px 12px;background:#0284c7!important;color:#fff!important;box-shadow:0 2px 0 rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.16);text-shadow:0 1px 1px rgba(0,0,0,.22);transition:transform .1s ease,filter .1s ease,box-shadow .1s ease;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #zmf .mid .text-convert:hover{background:#0369a1!important;filter:brightness(1.12)}
 #zmf .mid .text-convert:active{transform:translateY(1px) scale(.98);box-shadow:0 1px 0 rgba(0,0,0,.2),inset 0 2px 4px rgba(0,0,0,.2)}
@@ -143,12 +143,6 @@
 #zmf .menu button.sel:after{content:'✓';float:right;color:#5eead4}
 #zmf .indent .menu{left:10px}
 #zmf .outdent .menu{right:10px}
-/* 清理围栏的模式菜单嵌入主按钮宽度内，不额外挤占底栏；当前选择由菜单中的 ✓ 标识。 */
-#zmf .clean-split{position:relative;display:flex;flex:0 0 auto;z-index:21}
-#zmf .mid .clean-main{position:relative;min-width:112px!important;padding:8px 38px 8px 12px!important;border-radius:9px!important}
-#zmf .clean-arrow{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;width:30px;border-left:1px solid rgba(255,255,255,.25);border-radius:0 9px 9px 0;background:rgba(81,45,0,.28);color:#fff;font:700 11px/1 system-ui;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
-#zmf .clean-arrow:hover{background:rgba(81,45,0,.48)}
-#zmf .clean-split .cleanmenu{right:0;left:auto;bottom:calc(100% + 8px);width:196px;min-width:196px;box-sizing:border-box;z-index:30}
 /* 导入 Bottom Sheet：先由主按钮迅速打开面板，再由面板内的真实点击触发系统文件选择器。 */
 #zmf .sheet-backdrop{position:absolute;inset:0;z-index:100;display:flex;align-items:flex-end;background:rgba(7,10,18,.52);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .16s ease-out}
 #zmf .sheet-backdrop.show{opacity:1;visibility:visible;pointer-events:auto}
@@ -303,29 +297,7 @@
     add(exportSplit, extensionMenu);
     add(middle, exportSplit);
 
-    var cleanSplit = makeElement('div', 'clean-split');
-    var cleanAction = makeButton('b go clean-main', 'cf', '');
-    var cleanLabel = makeElement('span', '', '清理围栏');
-    cleanLabel.dataset.feedbackLabel = '';
-    add(cleanAction, cleanLabel);
-    var cleanDrop = makeElement('span', 'clean-arrow', '▼');
-    cleanDrop.dataset.m = 'clean';
-    setAttributes(cleanDrop, { role: 'button', tabindex: '0', 'aria-label': '选择清理围栏模式', 'aria-haspopup': 'menu' });
-    add(cleanAction, cleanDrop);
-    add(cleanSplit, cleanAction);
-    var cleanMenu = makeElement('div', 'menu cleanmenu');
-    cleanMenu.dataset.menu = 'clean';
-    cleanMenu.setAttribute('role', 'menu');
-    var stripOption = makeButton('', '', '仅清理围栏');
-    stripOption.dataset.cleanMode = 'strip';
-    stripOption.setAttribute('role', 'menuitemradio');
-    add(cleanMenu, stripOption);
-    var wrapOption = makeButton('', '', '清理后整体加围栏');
-    wrapOption.dataset.cleanMode = 'wrap';
-    wrapOption.setAttribute('role', 'menuitemradio');
-    add(cleanMenu, wrapOption);
-    add(cleanSplit, cleanMenu);
-    add(middle, cleanSplit);
+    add(middle, makeButton('b paste-main', 'pa', '粘贴'));
     add(middle, makeButton('b text-convert', 'pt', '转纯文本'));
     add(footer, middle);
 
@@ -372,9 +344,7 @@
     var customExtInput = P.querySelector('[data-custom-ext]');
     var customExtButton = P.querySelector('[data-k="custom-ext"]');
     var extCurrent = P.querySelector('[data-ext-current]');
-    var cleanButton = P.querySelector('[data-k="cf"]');
-    var cleanDropButton = P.querySelector('[data-m="clean"]');
-    var cleanLabelTarget = P.querySelector('[data-feedback-label]');
+    var pasteButton = P.querySelector('[data-k="pa"]');
     var plainTextButton = P.querySelector('[data-k="pt"]');
     var dragging = false;
     var startX = 0;
@@ -386,7 +356,6 @@
     var inStep = 2;
     var outStep = 2;
     var exportExtension = 'txt';
-    var cleanMode = 'strip';
 
     function count() {
       C.textContent = A.value.length.toLocaleString();
@@ -520,22 +489,6 @@
       return true;
     }
 
-    function updateCleanMode(mode) {
-      cleanMode = mode === 'wrap' ? 'wrap' : 'strip';
-      var modeText = cleanMode === 'wrap' ? '清理围栏后为整体添加围栏' : '仅清理原有围栏';
-      var buttonLabel = cleanMode === 'wrap' ? '清理+围栏' : '清理围栏';
-      // 菜单 ✓、主按钮文案、title 与 aria-label 都同步当前模式，避免用户关闭菜单后无法确认选择。
-      cleanButton.dataset.normalLabel = buttonLabel;
-      if (!cleanButton.classList.contains('is-feedback')) cleanLabelTarget.textContent = buttonLabel;
-      cleanButton.title = modeText;
-      cleanDropButton.setAttribute('aria-label', '选择清理围栏模式，当前：' + modeText);
-      P.querySelectorAll('[data-menu="clean"] button[data-clean-mode]').forEach(function (button) {
-        var selected = button.dataset.cleanMode === cleanMode;
-        button.classList.toggle('sel', selected);
-        button.setAttribute('aria-checked', selected ? 'true' : 'false');
-      });
-    }
-
     function toggleMenu(kind, event) {
       event.stopPropagation();
       var menu = P.querySelector('[data-menu="' + kind + '"]');
@@ -548,7 +501,7 @@
     }
 
     function closeOnOutside(event) {
-      if (!event.target.closest('#zmf .indent') && !event.target.closest('#zmf .outdent') && !event.target.closest('#zmf .export-split') && !event.target.closest('#zmf .clean-split')) {
+      if (!event.target.closest('#zmf .indent') && !event.target.closest('#zmf .outdent') && !event.target.closest('#zmf .export-split')) {
         closeMenus();
       }
     }
@@ -582,7 +535,7 @@
     A.addEventListener('input', count);
 
     function flashButton(button, message, duration) {
-      // 清理按钮内部带有下拉箭头；只替换其标签 span，不能用 button.textContent 覆盖并删除箭头。
+      // 按钮内部可能带有标签 span；优先替换标签而非 button.textContent，兼容带子元素的按钮。
       var labelTarget = button.querySelector('[data-feedback-label]') || button;
       var normal = button.dataset.normalLabel || labelTarget.textContent;
       button.dataset.normalLabel = normal;
@@ -691,32 +644,6 @@
     exportDropButton.onclick = function (event) {
       toggleMenu('ext', event);
     };
-    // 这个箭头嵌在“清理围栏”主按钮内，须阻止事件冒泡，避免点箭头同时执行清理。
-    cleanDropButton.addEventListener('pointerdown', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    cleanDropButton.addEventListener('mousedown', function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    cleanDropButton.onclick = function (event) {
-      event.preventDefault();
-      toggleMenu('clean', event);
-    };
-    cleanDropButton.onkeydown = function (event) {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        toggleMenu('clean', event);
-      }
-    };
-    P.querySelectorAll('[data-menu="clean"] button[data-clean-mode]').forEach(function (button) {
-      button.onclick = function (event) {
-        event.stopPropagation();
-        updateCleanMode(button.dataset.cleanMode);
-        closeMenus();
-      };
-    });
     P.querySelectorAll('[data-menu="ext"] button[data-ext]').forEach(function (button) {
       button.onclick = function (event) {
         event.stopPropagation();
@@ -756,7 +683,6 @@
     updateStep('in', inStep);
     updateStep('out', outStep);
     updateExportExtension(exportExtension);
-    updateCleanMode(cleanMode);
 
     H.onpointerdown = function (event) {
       if (event.target === X || event.target.closest('.x')) return;
@@ -874,43 +800,29 @@
       flashButton(plainTextButton, '已转纯文本');
     }
 
-    function trimOuterBlankLines(value) {
-      // 只移除首尾“空行”（可含普通空格或 Tab），不会破坏第一/最后一行正文原有的缩进。
-      // 不能用 value.trim()，否则第一/最后一行代码本身的前导/尾随空格也会被错误删除。
-      var lines = value.split('\n');
-      while (lines.length && /^[ \t]*$/.test(lines[0])) lines.shift();
-      while (lines.length && /^[ \t]*$/.test(lines[lines.length - 1])) lines.pop();
-      return lines.join('\n');
-    }
-
-    function cleanFences() {
-      if (!A.value) {
-        flashButton(cleanButton, '无内容');
+    function pasteText() {
+      // 读取系统剪贴板并插入当前光标处；有选区则替换选区。读取需要浏览器授予剪贴板权限。
+      if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
+        flashButton(pasteButton, '无法读取');
         return;
       }
-      var cleaned = A.value
-        .replace(/\r\n?/g, '\n')
-        .replace(/^[ \t]*```[^\n]*\n/gm, '')
-        .replace(/^[ \t]*```[ \t]*$/gm, '');
-
-      if (cleanMode === 'wrap') {
-        // 包裹前只清除整体内容最外层的空行，保证开/闭围栏与正文紧贴；正文内部空行完全保留。
-        var content = trimOuterBlankLines(cleaned);
-        if (content === '') {
-          A.value = '';
-          count();
-          flashButton(cleanButton, '无内容');
+      flashButton(pasteButton, '粘贴中');
+      navigator.clipboard.readText().then(function (text) {
+        if (!text) {
+          flashButton(pasteButton, '剪贴板为空');
           return;
         }
-        // 开围栏不附带语言声明；content 的首尾已没有空行，故两侧均不会出现多余空白行。
-        A.value = '```\n' + content + '\n```';
+        var value = A.value;
+        var start = Math.max(0, Math.min(A.selectionStart, value.length));
+        var end = Math.max(start, Math.min(A.selectionEnd, value.length));
+        A.value = value.slice(0, start) + text + value.slice(end);
+        var caret = start + text.length;
+        A.setSelectionRange(caret, caret);
         count();
-        flashButton(cleanButton, '已加围栏');
-      } else {
-        A.value = cleaned;
-        count();
-        flashButton(cleanButton, '已清理');
-      }
+        flashButton(pasteButton, '已粘贴');
+      }).catch(function () {
+        flashButton(pasteButton, '粘贴失败');
+      });
     }
 
     function legacyCopy() {
@@ -1011,7 +923,7 @@
     installInstantAction(clearButton, clearText);
     installInstantAction(importButton, openImportSheet);
     installInstantAction(exportButton, exportText);
-    installInstantAction(cleanButton, cleanFences);
+    installInstantAction(pasteButton, pasteText);
     installInstantAction(plainTextButton, convertMarkdownToPlainText);
 
     count();
@@ -1205,9 +1117,7 @@
     #zmf .ib { padding: 0 22px !important; }
     #zmf .db { width: 40px !important; min-width: 40px !important; }
     #zmf .mid .b, #zmf .mid .text-convert { min-height: 42px; padding-top: 10px; padding-bottom: 10px; }
-    #zmf .mid .clean-main { min-height: 42px; }
     #zmf .export-split > .ext-drop { height: 42px; min-height: 42px; }
-    #zmf .clean-arrow { border-radius: 0 9px 9px 0; }
 
     /* 缩进 / 反缩进按住反馈色保持朋友原值，不改动。 */
     #zmf .indent > .ib.is-pressed {
@@ -1247,7 +1157,7 @@
     #zmf .menu button.sel:after { color: #9ecbff; }
     #zmf .indent .menu { left: 0; }
     #zmf .outdent .menu { right: 0; }
-    #zmf .export-split .extmenu, #zmf .clean-split .cleanmenu { top: calc(100% + 8px); bottom: auto; }
+    #zmf .export-split .extmenu { top: calc(100% + 8px); bottom: auto; }
     #zmf .ext-current { color: #b9b9b9; border-bottom-color: #565656; }
     #zmf .extmenu .custom-ext { border-top-color: #565656; }
     #zmf .extmenu input {
@@ -1360,7 +1270,7 @@
       #zmf .mid { gap: 6px; }
       #zmf .mid .b { min-width: 66px; padding-left: 10px; padding-right: 10px; font-size: 13px; }
       #zmf .mid .wrap-toggle { min-width: 106px; padding-left: 10px; padding-right: 9px; font-size: 12px; }
-      #zmf .mid .clean-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
+      #zmf .mid .paste-main, #zmf .mid .text-convert { width: 106px; min-width: 106px !important; }
       #zmf .export-split > .b { min-width: 88px; }
       #zmf .indent > .ib, #zmf .outdent > .ib { padding: 0 17px !important; }
       #zmf textarea { padding: 16px; font-size: 13px; line-height: 1.65; }
@@ -1391,7 +1301,7 @@
 
       var editor = panel.querySelector('textarea');
       function suppressEditorKeyboard() {
-        // 共享面板的工具按钮也采用该策略；这里让嵌在清理按钮中的箭头同样立即收起软键盘。
+        // 共享面板的工具按钮也采用该策略；这里让标题栏内的其它控件同样立即收起软键盘。
         if (!editor) return;
         editor.setAttribute('inputmode', 'none');
         editor.readOnly = true;
@@ -1434,14 +1344,6 @@
         wrapToggle.addEventListener('pointerdown', suppressEditorKeyboard, true);
         wrapToggle.addEventListener('click', function () {
           setWrapDisplay(!wrapEnabled);
-        });
-      }
-
-      // “清理围栏”的箭头嵌在主按钮内。捕获阶段先锁定编辑器输入模式，避免触摸该箭头时重新请求软键盘。
-      var cleanArrow = panel.querySelector('.clean-arrow');
-      if (cleanArrow) {
-        ['pointerdown', 'mousedown', 'click'].forEach(function (eventName) {
-          cleanArrow.addEventListener(eventName, suppressEditorKeyboard, true);
         });
       }
 
